@@ -1,11 +1,8 @@
-import { tenantService } from '@/services/tenantService'
+import { getAuthTenant } from '@/lib/auth'
 import SettingsForm from '@/components/admin/SettingsForm'
 
-const DEMO_TENANT_ID = '7e72666f-53ac-4080-b27b-14073217bab4'
-
 export default async function SettingsPage() {
-  const tenant = await tenantService.getTenantById(DEMO_TENANT_ID)
-  if (!tenant) return <p className="text-sm text-secondary">Tenant not found.</p>
+  const tenant = await getAuthTenant()
 
   return (
     <div className="flex flex-col gap-6">

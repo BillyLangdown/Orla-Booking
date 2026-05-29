@@ -2,6 +2,12 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { signOutAction } from '@/app/login/actions'
+
+interface Props {
+  tenantName: string
+  tenantSlug: string
+}
 
 const NAV = [
   {
@@ -36,7 +42,7 @@ const NAV = [
   },
 ]
 
-export default function Sidebar() {
+export default function Sidebar({ tenantName, tenantSlug }: Props) {
   const pathname = usePathname()
 
   return (
@@ -44,12 +50,9 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="flex items-center gap-2.5 px-5 py-5 border-b border-border">
         <div className="flex h-7 w-7 items-center justify-center rounded-md bg-ink text-white text-xs font-bold">
-          B
+          {tenantName.charAt(0)}
         </div>
-        <span className="font-semibold text-ink text-sm">BookMoto</span>
-        <span className="ml-auto text-[10px] font-medium text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
-          Demo
-        </span>
+        <span className="font-semibold text-ink text-sm truncate">{tenantName}</span>
       </div>
 
       {/* Nav */}
@@ -74,10 +77,10 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Footer link */}
-      <div className="border-t border-border p-3">
+      {/* Footer */}
+      <div className="border-t border-border p-3 flex flex-col gap-1">
         <Link
-          href="/book/southern-moto-school"
+          href={`/book/${tenantSlug}`}
           className="flex items-center gap-2 text-xs text-secondary hover:text-ink transition-colors px-3 py-2"
           target="_blank"
         >
@@ -86,6 +89,17 @@ export default function Sidebar() {
           </svg>
           View booking page
         </Link>
+        <form action={signOutAction}>
+          <button
+            type="submit"
+            className="flex w-full items-center gap-2 text-xs text-secondary hover:text-rose-600 transition-colors px-3 py-2"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M5 2H2.5A1.5 1.5 0 001 3.5v7A1.5 1.5 0 002.5 12H5M9 10l3-3-3-3M12 7H5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Sign out
+          </button>
+        </form>
       </div>
     </aside>
   )

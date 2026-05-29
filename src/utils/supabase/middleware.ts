@@ -4,10 +4,10 @@ import { type NextRequest, NextResponse } from 'next/server'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
 
-export const createClient = (request: NextRequest) => {
+export const createClient = async (request: NextRequest) => {
   let supabaseResponse = NextResponse.next({ request: { headers: request.headers } })
 
-  createServerClient(supabaseUrl, supabaseKey, {
+  const supabase = createServerClient(supabaseUrl, supabaseKey, {
     cookies: {
       getAll() {
         return request.cookies.getAll()
@@ -21,6 +21,19 @@ export const createClient = (request: NextRequest) => {
       },
     },
   })
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const isDashboard = request.nextUrl.pathname.startsWith('/dashboard')
+  const isLogin     = request.nextUrl.pathname === '/login'
+
+  if (isDashboard && !user) {
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  if (isLogin && user) {
+    return NextResponse.redirect(new URL('/dashboard/bookings', request.url))
+  }
 
   return supabaseResponse
 }

@@ -1,14 +1,15 @@
 import { availabilityService } from '@/services/availabilityService'
 import { resourceService } from '@/services/resourceService'
+import { getAuthTenant } from '@/lib/auth'
 import AvailabilityList from '@/components/admin/AvailabilityList'
 import SlotCreateForm from '@/components/admin/SlotCreateForm'
 
-const DEMO_TENANT_ID = '7e72666f-53ac-4080-b27b-14073217bab4'
-
 export default async function AvailabilityPage() {
+  const tenant = await getAuthTenant()
+
   const [slots, resources] = await Promise.all([
-    availabilityService.getAllSlots(DEMO_TENANT_ID),
-    resourceService.getResources(DEMO_TENANT_ID),
+    availabilityService.getAllSlots(tenant.id),
+    resourceService.getResources(tenant.id),
   ])
 
   return (
@@ -18,7 +19,7 @@ export default async function AvailabilityPage() {
           <h1 className="text-lg font-semibold text-ink">Availability</h1>
           <p className="text-sm text-secondary mt-0.5">{slots.length} slots configured</p>
         </div>
-        <SlotCreateForm tenantId={DEMO_TENANT_ID} resources={resources} />
+        <SlotCreateForm tenantId={tenant.id} resources={resources} />
       </div>
       <AvailabilityList slots={slots} />
     </div>
