@@ -34,12 +34,22 @@ export default function BookingPageClient({ tenant, slots }: Props) {
     setView('slots')
   }
 
+  const { primaryColor, accentColor } = tenant.branding
+
   return (
-    <>
+    <div
+      style={{
+        '--color-accent':       accentColor,
+        '--color-accent-hover': accentColor,
+      } as React.CSSProperties}
+    >
       {/* Tenant header */}
       <header className="border-b border-border bg-white">
         <div className="mx-auto max-w-2xl px-4 py-5 flex items-center gap-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-white font-bold text-lg shrink-0">
+          <div
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-white font-bold text-lg shrink-0"
+            style={{ backgroundColor: primaryColor }}
+          >
             {tenant.name.charAt(0)}
           </div>
           <div>
@@ -74,6 +84,6 @@ export default function BookingPageClient({ tenant, slots }: Props) {
           <BookingSuccess booking={confirmedBooking} onBookAnother={handleBookAnother} />
         )}
       </main>
-    </>
+    </div>
   )
 }

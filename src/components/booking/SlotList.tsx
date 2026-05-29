@@ -53,7 +53,9 @@ export default function SlotList({ slots, onSelect }: Props) {
       {/* Slot groups */}
       {Object.keys(grouped).length === 0 ? (
         <p className="text-sm text-secondary py-8 text-center">
-          No available slots for this filter.
+          {filter === 'All'
+            ? 'No upcoming slots available right now. Check back soon.'
+            : `No available ${filter} slots. Try a different course type.`}
         </p>
       ) : (
         Object.entries(grouped)

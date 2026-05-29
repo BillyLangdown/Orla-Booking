@@ -1,4 +1,5 @@
 import Sidebar from '@/components/admin/Sidebar'
+import MobileNav from '@/components/admin/MobileNav'
 
 export const metadata = {
   title: 'Dashboard — BookMoto',
@@ -25,11 +26,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </span>
         </div>
 
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        {/* Page content — extra bottom padding on mobile to clear the fixed bottom nav */}
+        <main className="flex-1 overflow-y-auto p-4 pb-20 sm:p-6 sm:pb-6 lg:p-8">
           {children}
         </main>
       </div>
+      <MobileNav />
     </div>
   )
 }

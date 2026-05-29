@@ -1,5 +1,6 @@
 import type { AvailabilitySlot } from '@/types'
 import Badge from '@/components/ui/Badge'
+import DeleteSlotButton from '@/components/admin/DeleteSlotButton'
 
 interface Props {
   slots: AvailabilitySlot[]
@@ -62,13 +63,14 @@ export default function AvailabilityList({ slots }: Props) {
                   <span className="text-sm text-secondary">{slot.resource.name}</span>
                   <CapacityBar booked={slot.booked} capacity={slot.capacity} />
                   {slot.booked >= slot.capacity && (
-                    <span className="ml-auto text-xs font-medium text-rose-600">Full</span>
+                    <span className="text-xs font-medium text-rose-600">Full</span>
                   )}
                   {slot.booked < slot.capacity && (
-                    <span className="ml-auto text-xs text-green-600">
+                    <span className="text-xs text-green-600">
                       {slot.capacity - slot.booked} available
                     </span>
                   )}
+                  <DeleteSlotButton slotId={slot.id} hasBookings={slot.booked > 0} />
                 </li>
               ))}
             </ul>

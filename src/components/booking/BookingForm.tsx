@@ -24,6 +24,7 @@ export default function BookingForm({ slot, tenantId, onBack, onSuccess }: Props
   const [email, setEmail] = useState('')
   const [notes, setNotes] = useState('')
   const [errors, setErrors] = useState<FormErrors>({})
+  const [serverError, setServerError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
   function validate(): boolean {
@@ -42,6 +43,7 @@ export default function BookingForm({ slot, tenantId, onBack, onSuccess }: Props
     e.preventDefault()
     if (!validate()) return
 
+    setServerError(null)
     setSubmitting(true)
     try {
       const input: CreateBookingInput = {
@@ -57,6 +59,8 @@ export default function BookingForm({ slot, tenantId, onBack, onSuccess }: Props
       }
       const booking = await createBookingAction(input)
       onSuccess(booking)
+    } catch (err) {
+      setServerError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
     } finally {
       setSubmitting(false)
     }
@@ -121,6 +125,11 @@ export default function BookingForm({ slot, tenantId, onBack, onSuccess }: Props
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Any experience level, questions, or requirements…"
         />
+        {serverError && (
+          <p className="rounded-md bg-rose-50 border border-rose-200 px-3 py-2 text-sm text-rose-700">
+            {serverError}
+          </p>
+        )}
         <Button type="submit" loading={submitting} size="lg" className="w-full mt-2">
           Confirm booking
         </Button>

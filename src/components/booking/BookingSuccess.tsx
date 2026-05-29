@@ -26,7 +26,7 @@ export default function BookingSuccess({ booking, onBookAnother }: Props) {
       <div className="flex flex-col gap-2">
         <h2 className="text-xl font-semibold text-ink">Booking confirmed!</h2>
         <p className="text-sm text-secondary max-w-xs">
-          A confirmation has been noted. You&apos;ll hear from the school shortly.
+          A confirmation email has been sent to <strong>{booking.email}</strong>.
         </p>
       </div>
 
