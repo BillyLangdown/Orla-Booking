@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, FormEvent } from 'react'
+import { useRouter } from 'next/navigation'
 import { signInAction } from './actions'
 
 export default function LoginPage() {
+  const router = useRouter()
   const [error, setError]     = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -12,9 +14,11 @@ export default function LoginPage() {
     setError(null)
     setLoading(true)
     const result = await signInAction(new FormData(e.currentTarget))
-    if (result?.error) {
+    if (result.error) {
       setError(result.error)
       setLoading(false)
+    } else {
+      router.push('/dashboard/bookings')
     }
   }
 
