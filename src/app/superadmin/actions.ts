@@ -1,0 +1,92 @@
+'use server'
+
+import { revalidatePath } from 'next/cache'
+import { adminSupabase } from '@/lib/supabase/admin'
+
+interface CreateSchoolInput {
+  name: string
+  slug: string
+  email: string
+  phone: string
+  address: string
+  description: string
+  primaryColor: string
+  accentColor: string
+  adminEmail: string
+  adminPassword: string
+}
+
+export async function createSchoolAction(
+  input: CreateSchoolInput,
+): Promise<{ error?: string; tenantId?: string }> {
+  // 1. Create tenant
+  const { data: tenant, error: tenantError } = await adminSupabase
+    .from('tenants')
+    .insert({
+      name:        input.name,
+      slug:        input.slug,
+      email:       input.email,
+      phone:       input.phone,
+      address:     input.address,
+      description: input.description,
+      branding: {
+        primary_color: input.primaryColor,
+        accent_color:  input.accentColor,
+      },
+    })
+    .select()
+    .single()
+
+  if (tenantError) return { error: tenantError.message }
+
+  // 2. Create Supabase Auth user (email_confirm skips verification email)
+  const { data: authData, error: authError } = await adminSupabase.auth.admin.createUser({
+    email:         input.adminEmail,
+    password:      input.adminPassword,
+    email_confirm: true,
+  })
+
+  if (authError) {
+    await adminSupabase.from('tenants').delete().eq('id', tenant.id)
+    return { error: authError.message }
+  }
+
+  // 3. Link auth user to tenant in the users table
+  const { error: userError } = await adminSupabase.from('users').insert({
+    id:        authData.user.id,
+    tenant_id: tenant.id,
+    email:     input.adminEmail,
+    role:      'admin',
+  })
+
+  if (userError) {
+    await adminSupabase.auth.admin.deleteUser(authData.user.id)
+    await adminSupabase.from('tenants').delete().eq('id', tenant.id)
+    return { error: userError.message }
+  }
+
+  revalidatePath('/superadmin')
+  return { tenantId: tenant.id }
+}
+
+export async function createResourceAction(
+  tenantId: string,
+  name: string,
+  type: string,
+): Promise<{ error?: string }> {
+  const { error } = await adminSupabase
+    .from('resources')
+    .insert({ tenant_id: tenantId, name, type })
+
+  if (error) return { error: error.message }
+  revalidatePath(`/superadmin/${tenantId}`)
+  return {}
+}
+
+export async function deleteResourceAction(
+  resourceId: string,
+  tenantId: string,
+): Promise<void> {
+  await adminSupabase.from('resources').delete().eq('id', resourceId)
+  revalidatePath(`/superadmin/${tenantId}`)
+}

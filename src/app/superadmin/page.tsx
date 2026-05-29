@@ -1,0 +1,70 @@
+import Link from 'next/link'
+import { tenantService } from '@/services/tenantService'
+
+export default async function SuperAdminPage() {
+  const tenants = await tenantService.getAllTenants()
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-lg font-semibold text-ink">Schools</h1>
+          <p className="text-sm text-secondary mt-0.5">{tenants.length} organisation{tenants.length !== 1 ? 's' : ''}</p>
+        </div>
+        <Link
+          href="/superadmin/new"
+          className="inline-flex items-center gap-1.5 rounded-md bg-accent text-white px-3 py-1.5 text-sm font-medium hover:bg-accent-hover transition-colors"
+        >
+          + Add school
+        </Link>
+      </div>
+
+      <div className="overflow-hidden rounded-xl border border-border bg-white">
+        {tenants.length === 0 ? (
+          <div className="py-16 text-center">
+            <p className="text-sm text-secondary">No schools yet.</p>
+            <Link href="/superadmin/new" className="mt-3 inline-block text-sm text-accent hover:underline">
+              Add your first school
+            </Link>
+          </div>
+        ) : (
+          <ul className="divide-y divide-border">
+            {tenants.map((t) => (
+              <li key={t.id}>
+                <Link
+                  href={`/superadmin/${t.id}`}
+                  className="flex items-center gap-4 px-5 py-4 hover:bg-subtle transition-colors group"
+                >
+                  <div
+                    className="flex h-9 w-9 items-center justify-center rounded-lg text-white text-sm font-bold shrink-0"
+                    style={{ backgroundColor: t.branding.primaryColor }}
+                  >
+                    {t.name.charAt(0)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm text-ink">{t.name}</p>
+                    <p className="text-xs text-secondary mt-0.5">/book/{t.slug}</p>
+                  </div>
+                  <div className="flex items-center gap-4 shrink-0">
+                    {t.email && <span className="text-xs text-secondary hidden sm:block">{t.email}</span>}
+                    <Link
+                      href={`/book/${t.slug}`}
+                      target="_blank"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-xs text-accent hover:underline hidden sm:block"
+                    >
+                      Booking page ↗
+                    </Link>
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-secondary group-hover:text-ink transition-colors" aria-hidden="true">
+                      <path d="M5 2.5L9 7l-4 4.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  )
+}
