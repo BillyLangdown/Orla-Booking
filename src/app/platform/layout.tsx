@@ -21,7 +21,7 @@ export default async function SuperAdminLayout({ children }: { children: React.R
           </div>
 
           <nav className="flex items-center gap-4 flex-1">
-            <Link href="/superadmin" className="text-sm text-secondary hover:text-ink transition-colors">
+            <Link href="/platform" className="text-sm text-secondary hover:text-ink transition-colors">
               Schools
             </Link>
           </nav>

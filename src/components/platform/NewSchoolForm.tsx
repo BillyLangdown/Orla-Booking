@@ -2,7 +2,7 @@
 
 import { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { createSchoolAction } from '@/app/superadmin/actions'
+import { createSchoolAction } from '@/app/platform/actions'
 import { Input } from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 
@@ -71,7 +71,7 @@ export default function NewSchoolForm() {
       setError(result.error)
       setSubmitting(false)
     } else {
-      router.push(`/superadmin/${result.tenantId}`)
+      router.push(`/platform/${result.tenantId}`)
     }
   }
 

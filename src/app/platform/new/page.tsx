@@ -1,4 +1,4 @@
-import NewSchoolForm from '@/components/superadmin/NewSchoolForm'
+import NewSchoolForm from '@/components/platform/NewSchoolForm'
 
 export default function NewSchoolPage() {
   return (

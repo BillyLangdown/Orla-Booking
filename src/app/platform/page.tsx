@@ -14,7 +14,7 @@ export default async function SuperAdminPage() {
           <p className="text-sm text-secondary mt-0.5">{tenants.length} organisation{tenants.length !== 1 ? 's' : ''}</p>
         </div>
         <Link
-          href="/superadmin/new"
+          href="/platform/new"
           className="inline-flex items-center gap-1.5 rounded-md bg-accent text-white px-3 py-1.5 text-sm font-medium hover:bg-accent-hover transition-colors"
         >
           + Add school
@@ -25,7 +25,7 @@ export default async function SuperAdminPage() {
         {tenants.length === 0 ? (
           <div className="py-16 text-center">
             <p className="text-sm text-secondary">No schools yet.</p>
-            <Link href="/superadmin/new" className="mt-3 inline-block text-sm text-accent hover:underline">
+            <Link href="/platform/new" className="mt-3 inline-block text-sm text-accent hover:underline">
               Add your first school
             </Link>
           </div>
@@ -34,7 +34,7 @@ export default async function SuperAdminPage() {
             {tenants.map((t) => (
               <li key={t.id}>
                 <Link
-                  href={`/superadmin/${t.id}`}
+                  href={`/platform/${t.id}`}
                   className="flex items-center gap-4 px-5 py-4 hover:bg-subtle transition-colors group"
                 >
                   <div

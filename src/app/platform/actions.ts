@@ -65,7 +65,7 @@ export async function createSchoolAction(
     return { error: userError.message }
   }
 
-  revalidatePath('/superadmin')
+  revalidatePath('/platform')
   return { tenantId: tenant.id }
 }
 
@@ -79,7 +79,7 @@ export async function createResourceAction(
     .insert({ tenant_id: tenantId, name, type })
 
   if (error) return { error: error.message }
-  revalidatePath(`/superadmin/${tenantId}`)
+  revalidatePath(`/platform/${tenantId}`)
   return {}
 }
 
@@ -88,5 +88,5 @@ export async function deleteResourceAction(
   tenantId: string,
 ): Promise<void> {
   await adminSupabase.from('resources').delete().eq('id', resourceId)
-  revalidatePath(`/superadmin/${tenantId}`)
+  revalidatePath(`/platform/${tenantId}`)
 }

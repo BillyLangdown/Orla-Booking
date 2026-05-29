@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { tenantService } from '@/services/tenantService'
 import { resourceService } from '@/services/resourceService'
-import ResourceManager from '@/components/superadmin/ResourceManager'
+import ResourceManager from '@/components/platform/ResourceManager'
 
 interface Props {
   params: Promise<{ tenantId: string }>
@@ -22,7 +22,7 @@ export default async function SchoolDetailPage({ params }: Props) {
     <div className="flex flex-col gap-8 max-w-2xl">
 
       {/* Back */}
-      <Link href="/superadmin" className="flex items-center gap-1.5 text-sm text-secondary hover:text-ink transition-colors w-fit">
+      <Link href="/platform" className="flex items-center gap-1.5 text-sm text-secondary hover:text-ink transition-colors w-fit">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
           <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>

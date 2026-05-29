@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Resource } from '@/types'
-import { createResourceAction, deleteResourceAction } from '@/app/superadmin/actions'
+import { createResourceAction, deleteResourceAction } from '@/app/platform/actions'
 
 interface Props {
   tenantId: string
