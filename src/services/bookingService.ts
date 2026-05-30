@@ -1,17 +1,30 @@
 import { adminSupabase as supabase } from '@/lib/supabase/admin'
 import type { Booking, BookingStatus, CreateBookingInput, LicenceType } from '@/types'
 
+function isoToDate(iso: string): string {
+  // Returns YYYY-MM-DD — safe: a 1-hour UTC offset never crosses midnight for typical slots
+  return iso.slice(0, 10)
+}
+
+function isoToTime(iso: string): string {
+  // Returns HH:MM from the ISO string. Stored as UTC; CalendarView is a client component
+  // so the rendering environment resolves local display separately.
+  return iso.slice(11, 16)
+}
+
 function mapBooking(row: Record<string, unknown>): Booking {
-  const slotRow = row.slot as Record<string, string> | null | undefined
+  const startIso = row.start_time as string | null | undefined
+  const endIso   = row.end_time   as string | null | undefined
+
   return {
     id:          row.id as string,
     tenantId:    row.tenant_id as string,
     slotId:      (row.slot_id as string) ?? '',
-    slot: slotRow ? {
-      date:        slotRow.date,
-      startTime:   slotRow.start_time,
-      endTime:     slotRow.end_time,
-      licenceType: (slotRow.licence_type as LicenceType) ?? 'CBT',
+    slot: startIso ? {
+      date:        isoToDate(startIso),
+      startTime:   isoToTime(startIso),
+      endTime:     endIso ? isoToTime(endIso) : '',
+      licenceType: (row.licence_type as LicenceType) ?? 'CBT',
     } : undefined,
     name:        (row.customer_name as string) ?? '',
     email:       (row.customer_email as string) ?? '',
@@ -28,18 +41,19 @@ export const bookingService = {
   async getBookings(tenantId: string): Promise<Booking[]> {
     const { data, error } = await supabase
       .from('bookings')
-      .select('*, slot:availability_slots(date, start_time, end_time, licence_type)')
+      .select('*')
       .eq('tenant_id', tenantId)
       .order('created_at', { ascending: false })
 
-    if (error || !data) return []
+    if (error) { console.error('[bookings] getBookings error:', error.message); return [] }
+    if (!data) return []
     return (data as Record<string, unknown>[]).map(mapBooking)
   },
 
   async getBookingById(id: string): Promise<Booking | null> {
     const { data, error } = await supabase
       .from('bookings')
-      .select('*, slot:availability_slots(date, start_time, end_time, licence_type)')
+      .select('*')
       .eq('id', id)
       .single()
 
