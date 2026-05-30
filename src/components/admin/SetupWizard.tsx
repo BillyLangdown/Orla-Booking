@@ -101,7 +101,7 @@ export default function SetupWizard({ tenant }: Props) {
         {step === 0 && (
           <>
             <div>
-              <h1 className="text-2xl font-bold text-ink">Welcome! 👋</h1>
+              <h1 className="text-2xl font-bold text-ink">Welcome</h1>
               <p className="text-secondary mt-1">Let's get your booking page set up in a few quick steps.</p>
             </div>
             <div className="rounded-xl border border-border bg-white p-5 flex flex-col gap-4">
@@ -154,16 +154,16 @@ export default function SetupWizard({ tenant }: Props) {
                   onClick={() => { setUseExamples(true); setQuestions([]) }}
                   className={`flex-1 rounded-lg border-2 px-3 py-3 text-sm text-left transition-colors ${useExamples ? 'border-ink bg-subtle' : 'border-border hover:border-secondary'}`}
                 >
-                  <p className="font-semibold text-ink">Use moto school examples</p>
-                  <p className="text-xs text-secondary mt-0.5">Experience level, age, height, licence</p>
+                  <p className="font-semibold text-ink">Start from examples</p>
+                  <p className="text-xs text-secondary mt-0.5">Experience, age, licence check</p>
                 </button>
                 <button
                   type="button"
                   onClick={() => { setUseExamples(false) }}
                   className={`flex-1 rounded-lg border-2 px-3 py-3 text-sm text-left transition-colors ${!useExamples ? 'border-ink bg-subtle' : 'border-border hover:border-secondary'}`}
                 >
-                  <p className="font-semibold text-ink">Build my own</p>
-                  <p className="text-xs text-secondary mt-0.5">Fully custom for any industry</p>
+                  <p className="font-semibold text-ink">Build from scratch</p>
+                  <p className="text-xs text-secondary mt-0.5">Fully custom for your business</p>
                 </button>
               </div>
 
@@ -186,7 +186,11 @@ export default function SetupWizard({ tenant }: Props) {
 
         {step === 3 && (
           <div className="flex flex-col items-center text-center gap-6 py-8">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-green-50 text-3xl">🎉</div>
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M5 13l4 4L19 7" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
             <div>
               <h1 className="text-2xl font-bold text-ink">You&apos;re all set!</h1>
               <p className="text-secondary mt-2 max-w-sm">

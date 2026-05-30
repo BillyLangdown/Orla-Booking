@@ -4,7 +4,7 @@ import { getAuthTenant } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 
 export const metadata = {
-  title: 'Dashboard — BookMoto',
+  title: 'Dashboard',
 }
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {

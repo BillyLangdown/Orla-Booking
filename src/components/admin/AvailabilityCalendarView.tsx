@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import type { Booking } from '@/types'
+import type { AvailabilitySlot } from '@/types'
 
 interface Props {
-  bookings: Booking[]
+  slots: AvailabilitySlot[]
 }
 
 const HOURS = Array.from({ length: 13 }, (_, i) => i + 7) // 07:00–19:00
@@ -30,7 +30,14 @@ function fmt(d: Date) {
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
 }
 
-export default function CalendarView({ bookings }: Props) {
+function slotColors(booked: number, capacity: number) {
+  const pct = capacity === 0 ? 0 : booked / capacity
+  if (pct >= 1)   return 'bg-rose-50 border-rose-200 text-rose-700'
+  if (pct >= 0.5) return 'bg-amber-50 border-amber-200 text-amber-700'
+  return 'bg-emerald-50 border-emerald-200 text-emerald-700'
+}
+
+export default function AvailabilityCalendarView({ slots }: Props) {
   const [baseDate, setBaseDate] = useState(() => new Date())
   const weekDates = getWeekDates(baseDate)
   const todayStr  = isoDate(new Date())
@@ -46,39 +53,45 @@ export default function CalendarView({ bookings }: Props) {
     setBaseDate(d)
   }
 
-  const byDay: Record<string, Booking[]> = {}
-  for (const b of bookings) {
-    const date = b.slot?.date
-    if (!date) continue
-    if (!byDay[date]) byDay[date] = []
-    byDay[date].push(b)
+  const byDay: Record<string, AvailabilitySlot[]> = {}
+  for (const s of slots) {
+    if (!byDay[s.date]) byDay[s.date] = []
+    byDay[s.date].push(s)
   }
 
-  function bookingTop(startTime: string) {
+  const gridHeight = HOURS.length * 56
+
+  function slotTop(startTime: string) {
     const [h, m] = startTime.split(':').map(Number)
     return ((h - 7) + m / 60) * 56
   }
 
-  function bookingHeight(startTime: string, endTime: string) {
+  function slotHeight(startTime: string, endTime: string) {
     const [sh, sm] = startTime.split(':').map(Number)
     const [eh, em] = endTime.split(':').map(Number)
     const mins = (eh * 60 + em) - (sh * 60 + sm)
     return Math.max((mins / 60) * 56, 28)
   }
 
-  const gridHeight = HOURS.length * 56
-
   return (
     <div className="flex flex-col gap-3">
       {/* Week navigation */}
       <div className="flex items-center justify-between">
-        <button onClick={prevWeek} className="p-2 rounded-lg hover:bg-subtle transition-colors text-secondary hover:text-ink">
+        <button
+          onClick={prevWeek}
+          className="p-2 rounded-lg hover:bg-subtle transition-colors text-secondary hover:text-ink"
+          aria-label="Previous week"
+        >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
         </button>
         <span className="text-sm font-semibold text-ink">
           {fmt(weekDates[0])} – {fmt(weekDates[6])}
         </span>
-        <button onClick={nextWeek} className="p-2 rounded-lg hover:bg-subtle transition-colors text-secondary hover:text-ink">
+        <button
+          onClick={nextWeek}
+          className="p-2 rounded-lg hover:bg-subtle transition-colors text-secondary hover:text-ink"
+          aria-label="Next week"
+        >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 12l4-4-4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
         </button>
       </div>
@@ -92,7 +105,7 @@ export default function CalendarView({ bookings }: Props) {
             {weekDates.map((d, i) => {
               const ds = isoDate(d)
               const isToday = ds === todayStr
-              const count = (byDay[ds] ?? []).length
+              const count = byDay[ds]?.length ?? 0
               return (
                 <div key={i} className={`py-2.5 text-center border-l border-border ${isToday ? 'bg-accent/5' : ''}`}>
                   <p className="text-xs text-secondary">{DAYS[i]}</p>
@@ -100,14 +113,14 @@ export default function CalendarView({ bookings }: Props) {
                     {d.getDate()}
                   </p>
                   {count > 0 && (
-                    <p className="text-[10px] text-secondary mt-0.5">{count}</p>
+                    <p className="text-[10px] text-secondary mt-0.5">{count} slot{count !== 1 ? 's' : ''}</p>
                   )}
                 </div>
               )
             })}
           </div>
 
-          {/* Time + event grid */}
+          {/* Time + slot grid */}
           <div className="grid grid-cols-[52px_repeat(7,1fr)]" style={{ height: gridHeight }}>
             {/* Hour labels */}
             <div className="relative border-r border-border">
@@ -121,28 +134,31 @@ export default function CalendarView({ bookings }: Props) {
             {/* Day columns */}
             {weekDates.map((d, i) => {
               const ds = isoDate(d)
-              const dayBookings = byDay[ds] ?? []
+              const daySlots = byDay[ds] ?? []
               const isToday = ds === todayStr
               return (
                 <div key={i} className={`relative border-l border-border ${isToday ? 'bg-accent/5' : ''}`}>
-                  {/* Hour lines */}
                   {HOURS.map((h) => (
                     <div key={h} className="absolute w-full border-t border-border/40" style={{ top: (h - 7) * 56 }} />
                   ))}
-                  {/* Bookings */}
-                  {dayBookings.map((b) => {
-                    if (!b.slot?.startTime || !b.slot?.endTime) return null
-                    const top = bookingTop(b.slot.startTime)
-                    const height = bookingHeight(b.slot.startTime, b.slot.endTime)
+                  {daySlots.map((s) => {
+                    const top = slotTop(s.startTime)
+                    const height = slotHeight(s.startTime, s.endTime)
                     if (top < 0 || top > gridHeight) return null
+                    const colors = slotColors(s.booked, s.capacity)
                     return (
                       <div
-                        key={b.id}
-                        className="absolute mx-0.5 rounded border bg-accent/10 border-accent/30 px-1.5 py-1 overflow-hidden"
+                        key={s.id}
+                        className={`absolute mx-0.5 rounded border px-1.5 py-1 overflow-hidden ${colors}`}
                         style={{ top, height, left: 0, right: 0 }}
                       >
-                        <p className="text-xs font-semibold text-ink leading-tight truncate">{b.name}</p>
-                        <p className="text-xs text-secondary truncate">{b.slot.startTime}–{b.slot.endTime}</p>
+                        <p className="text-[11px] font-semibold leading-tight truncate">{s.resource.name}</p>
+                        <p className="text-[10px] leading-tight opacity-80 truncate">
+                          {s.startTime}–{s.endTime}
+                        </p>
+                        <p className="text-[10px] leading-tight opacity-70">
+                          {s.booked}/{s.capacity}
+                        </p>
                       </div>
                     )
                   })}

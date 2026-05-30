@@ -94,7 +94,7 @@ export default function SlotCreateForm({ tenantId, resources }: Props) {
       <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Resource */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-medium text-ink uppercase tracking-wide">Instructor / resource</label>
+          <label className="text-xs font-medium text-ink uppercase tracking-wide">Resource</label>
           <select value={resourceId} onChange={(e) => setResourceId(e.target.value)} className={selectClass} required>
             {resources.map((r) => (
               <option key={r.id} value={r.id}>{r.name} ({r.type})</option>
@@ -104,7 +104,7 @@ export default function SlotCreateForm({ tenantId, resources }: Props) {
 
         {/* Licence type */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-medium text-ink uppercase tracking-wide">Course type</label>
+          <label className="text-xs font-medium text-ink uppercase tracking-wide">Session type</label>
           <select
             value={licenceType}
             onChange={(e) => handleLicenceChange(e.target.value as LicenceType)}
