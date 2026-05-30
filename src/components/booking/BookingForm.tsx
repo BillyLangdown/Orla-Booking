@@ -118,25 +118,24 @@ export default function BookingForm({ slot, tenantId, intakeQuestions, onBack, o
     if (!validate()) return
     setServerError(null)
     setSubmitting(true)
-    try {
-      const input: CreateBookingInput = {
-        tenantId,
-        slotId:       slot.id,
-        resourceId:   slot.resourceId,
-        name:         name.trim(),
-        email:        email.trim().toLowerCase(),
-        phone:        phone.trim() || undefined,
-        licenceType:  slot.licenceType,
-        intakeAnswers: answers,
-        startTime:    new Date(`${slot.date}T${slot.startTime}:00`).toISOString(),
-        endTime:      new Date(`${slot.date}T${slot.endTime}:00`).toISOString(),
-      }
-      const booking = await createBookingAction(input)
-      onSuccess(booking)
-    } catch (err) {
-      setServerError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
-    } finally {
+    const input: CreateBookingInput = {
+      tenantId,
+      slotId:        slot.id,
+      resourceId:    slot.resourceId,
+      name:          name.trim(),
+      email:         email.trim().toLowerCase(),
+      phone:         phone.trim() || undefined,
+      licenceType:   slot.licenceType,
+      intakeAnswers: answers,
+      startTime:     new Date(`${slot.date}T${slot.startTime}:00`).toISOString(),
+      endTime:       new Date(`${slot.date}T${slot.endTime}:00`).toISOString(),
+    }
+    const result = await createBookingAction(input)
+    if (result.error) {
+      setServerError(result.error)
       setSubmitting(false)
+    } else if (result.booking) {
+      onSuccess(result.booking)
     }
   }
 

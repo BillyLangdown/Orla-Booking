@@ -7,12 +7,18 @@ import { tenantService } from '@/services/tenantService'
 import { sendBookingConfirmation } from '@/lib/email'
 import type { Booking, CreateBookingInput, CreateSlotInput, IntakeQuestion, UpdateTenantInput } from '@/types'
 
-export async function createBookingAction(input: CreateBookingInput): Promise<Booking> {
-  const booking = await bookingService.createBooking(input)
-  tenantService.getTenantById(input.tenantId).then((tenant) => {
-    if (tenant) sendBookingConfirmation(booking, input.startTime, input.endTime, tenant)
-  })
-  return booking
+export async function createBookingAction(
+  input: CreateBookingInput,
+): Promise<{ booking?: Booking; error?: string }> {
+  try {
+    const booking = await bookingService.createBooking(input)
+    tenantService.getTenantById(input.tenantId).then((tenant) => {
+      if (tenant) sendBookingConfirmation(booking, input.startTime, input.endTime, tenant)
+    })
+    return { booking }
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : 'Failed to create booking' }
+  }
 }
 
 export async function createSlotAction(input: CreateSlotInput): Promise<void> {
