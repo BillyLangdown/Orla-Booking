@@ -95,7 +95,7 @@ export default function SchoolDetailClient({ tenant, resources }: Props) {
       {tab === 'Resources' && (
         <div className="flex flex-col gap-2">
           <p className="text-xs text-secondary">
-            Instructors and bikes available to assign to availability slots.
+            Staff and assets available to assign to sessions.
           </p>
           <div className="bg-white shadow-sm p-5">
             <ResourceManager tenantId={tenant.id} resources={resources} />

@@ -44,8 +44,8 @@ export default function BookingSuccess({ booking, onBookAnother }: Props) {
           <span className="text-sm text-ink">{booking.email}</span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-xs text-secondary">Course</span>
-          <Badge variant="licence" value={booking.licenceType} />
+          <span className="text-xs text-secondary">Session type</span>
+          <Badge variant="session" value={booking.sessionType} />
         </div>
         <div className="flex items-center justify-between">
           <span className="text-xs text-secondary">Status</span>

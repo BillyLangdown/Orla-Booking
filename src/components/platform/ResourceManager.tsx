@@ -17,7 +17,7 @@ export default function ResourceManager({ tenantId, resources }: Props) {
   const [pending, startTransition] = useTransition()
 
   const [name, setName] = useState('')
-  const [type, setType] = useState<'instructor' | 'bike'>('instructor')
+  const [type, setType] = useState<'person' | 'asset'>('person')
   const [error, setError] = useState<string | null>(null)
 
   async function handleAdd() {
@@ -44,12 +44,12 @@ export default function ResourceManager({ tenantId, resources }: Props) {
 
       {/* Existing resources */}
       {resources.length === 0 ? (
-        <p className="text-sm text-secondary py-4 text-center">No instructors or bikes added yet.</p>
+        <p className="text-sm text-secondary py-4 text-center">No resources added yet.</p>
       ) : (
         <ul className="divide-y divide-border">
           {resources.map((r) => (
             <li key={r.id} className="flex items-center gap-3 py-3">
-              <span className="text-lg" aria-hidden="true">{r.type === 'instructor' ? '👤' : '🏍️'}</span>
+              <span className="text-lg" aria-hidden="true">{r.type === 'person' ? '👤' : '📦'}</span>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-ink">{r.name}</p>
                 <p className="text-xs text-secondary capitalize">{r.type}</p>
@@ -80,9 +80,9 @@ export default function ResourceManager({ tenantId, resources }: Props) {
             placeholder="Name"
             className={`${inputClass} flex-1 min-w-32`}
           />
-          <select value={type} onChange={(e) => setType(e.target.value as 'instructor' | 'bike')} className={inputClass}>
-            <option value="instructor">Instructor</option>
-            <option value="bike">Bike</option>
+          <select value={type} onChange={(e) => setType(e.target.value as 'person' | 'asset')} className={inputClass}>
+            <option value="person">Staff</option>
+            <option value="asset">Asset</option>
           </select>
           <button
             onClick={handleAdd}

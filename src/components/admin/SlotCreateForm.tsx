@@ -2,19 +2,9 @@
 
 import { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import type { Resource, LicenceType, CreateSlotInput } from '@/types'
+import type { Resource, CreateSlotInput } from '@/types'
 import { createSlotAction } from '@/app/actions'
 import Button from '@/components/ui/Button'
-
-const LICENCE_TYPES: LicenceType[] = ['CBT', 'A1', 'A2', 'DAS', 'Refresher']
-
-const LICENCE_DURATIONS: Record<LicenceType, { start: string; end: string }> = {
-  CBT:       { start: '08:00', end: '17:00' },
-  A1:        { start: '09:00', end: '13:00' },
-  A2:        { start: '09:00', end: '13:00' },
-  DAS:       { start: '09:00', end: '17:00' },
-  Refresher: { start: '13:00', end: '17:00' },
-}
 
 interface Props {
   tenantId: string
@@ -29,8 +19,8 @@ const tomorrow = () => {
 
 const today = () => new Date().toISOString().split('T')[0]
 
-const selectClass =
-  'w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition'
+const fieldClass =
+  'w-full border border-border bg-white px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-accent transition'
 
 export default function SlotCreateForm({ tenantId, resources }: Props) {
   const router = useRouter()
@@ -38,18 +28,12 @@ export default function SlotCreateForm({ tenantId, resources }: Props) {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const [resourceId, setResourceId]   = useState(resources[0]?.id ?? '')
-  const [licenceType, setLicenceType] = useState<LicenceType>('CBT')
+  const [resourceId, setResourceId] = useState(resources[0]?.id ?? '')
+  const [sessionType, setSessionType] = useState('')
   const [date, setDate]               = useState(tomorrow())
-  const [startTime, setStartTime]     = useState('08:00')
+  const [startTime, setStartTime]     = useState('09:00')
   const [endTime, setEndTime]         = useState('17:00')
   const [capacity, setCapacity]       = useState(1)
-
-  function handleLicenceChange(lt: LicenceType) {
-    setLicenceType(lt)
-    setStartTime(LICENCE_DURATIONS[lt].start)
-    setEndTime(LICENCE_DURATIONS[lt].end)
-  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -58,7 +42,7 @@ export default function SlotCreateForm({ tenantId, resources }: Props) {
     setSubmitting(true)
     try {
       const input: CreateSlotInput = {
-        tenantId, resourceId, licenceType, date, startTime, endTime, capacity,
+        tenantId, resourceId, sessionType, date, startTime, endTime, capacity,
       }
       await createSlotAction(input)
       setOpen(false)
@@ -79,7 +63,7 @@ export default function SlotCreateForm({ tenantId, resources }: Props) {
   }
 
   return (
-    <div className="rounded-xl border border-border bg-white p-5">
+    <div className="bg-white shadow-sm p-5">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-semibold text-ink">New availability slot</h2>
         <button
@@ -95,25 +79,24 @@ export default function SlotCreateForm({ tenantId, resources }: Props) {
         {/* Resource */}
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-medium text-ink uppercase tracking-wide">Resource</label>
-          <select value={resourceId} onChange={(e) => setResourceId(e.target.value)} className={selectClass} required>
+          <select value={resourceId} onChange={(e) => setResourceId(e.target.value)} className={fieldClass} required>
             {resources.map((r) => (
-              <option key={r.id} value={r.id}>{r.name} ({r.type})</option>
+              <option key={r.id} value={r.id}>{r.name}</option>
             ))}
           </select>
         </div>
 
-        {/* Licence type */}
+        {/* Session type */}
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-medium text-ink uppercase tracking-wide">Session type</label>
-          <select
-            value={licenceType}
-            onChange={(e) => handleLicenceChange(e.target.value as LicenceType)}
-            className={selectClass}
-          >
-            {LICENCE_TYPES.map((lt) => (
-              <option key={lt} value={lt}>{lt}</option>
-            ))}
-          </select>
+          <input
+            type="text"
+            value={sessionType}
+            onChange={(e) => setSessionType(e.target.value)}
+            placeholder="e.g. Beginner, Advanced, Consultation…"
+            className={fieldClass}
+            required
+          />
         </div>
 
         {/* Date */}
@@ -124,7 +107,7 @@ export default function SlotCreateForm({ tenantId, resources }: Props) {
             value={date}
             min={today()}
             onChange={(e) => setDate(e.target.value)}
-            className={selectClass}
+            className={fieldClass}
             required
           />
         </div>
@@ -135,10 +118,10 @@ export default function SlotCreateForm({ tenantId, resources }: Props) {
           <input
             type="number"
             min={1}
-            max={20}
+            max={100}
             value={capacity}
             onChange={(e) => setCapacity(Number(e.target.value))}
-            className={selectClass}
+            className={fieldClass}
             required
           />
         </div>
@@ -150,7 +133,7 @@ export default function SlotCreateForm({ tenantId, resources }: Props) {
             type="time"
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
-            className={selectClass}
+            className={fieldClass}
             required
           />
         </div>
@@ -162,7 +145,7 @@ export default function SlotCreateForm({ tenantId, resources }: Props) {
             type="time"
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
-            className={selectClass}
+            className={fieldClass}
             required
           />
         </div>

@@ -4,7 +4,7 @@ import { signOutAction } from '@/app/login/actions'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata = { title: 'Super Admin — BookMoto' }
+export const metadata = { title: 'Super Admin — Booq' }
 
 export default async function SuperAdminLayout({ children }: { children: React.ReactNode }) {
   await getAuthSuperAdmin()

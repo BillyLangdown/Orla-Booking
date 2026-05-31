@@ -15,10 +15,10 @@ const STEPS = ['Password', 'Business', 'Branding', 'Questions', 'Done'] as const
 type Step = typeof STEPS[number]
 
 const EXAMPLE_QUESTIONS: IntakeQuestion[] = [
-  { id: 'ex1', type: 'dropdown', label: 'Riding experience', required: true, options: ['None', 'Moped / Scooter', '125cc', 'Larger bike'] },
+  { id: 'ex1', type: 'dropdown', label: 'Experience level', required: true, options: ['Beginner', 'Intermediate', 'Advanced', 'Professional'] },
   { id: 'ex2', type: 'number', label: 'Age', required: true },
-  { id: 'ex3', type: 'number', label: 'Height (cm)', required: false },
-  { id: 'ex4', type: 'yesno', label: 'Do you hold a valid driving licence?', required: true },
+  { id: 'ex3', type: 'yesno', label: 'Have you done this before?', required: false },
+  { id: 'ex4', type: 'text', label: 'Any relevant qualifications?', required: false },
 ]
 
 function passwordRules(pwd: string) {
@@ -263,7 +263,7 @@ export default function SetupWizard({ tenant }: Props) {
                   className={`border-2 px-3 py-3 text-sm text-left transition-colors ${useExamples ? 'border-ink bg-subtle' : 'border-border hover:border-secondary'}`}
                 >
                   <p className="font-semibold text-ink">Start from examples</p>
-                  <p className="text-xs text-secondary mt-0.5">Experience, age, licence check</p>
+                  <p className="text-xs text-secondary mt-0.5">Experience, age, background</p>
                 </button>
                 <button
                   type="button"

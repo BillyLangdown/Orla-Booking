@@ -83,18 +83,18 @@ export default function NewSchoolForm() {
             value={name}
             onChange={(e) => handleNameChange(e.target.value)}
             required
-            placeholder="Southern Moto School"
+            placeholder="City Yoga Studio"
           />
           <div className="flex flex-col gap-1.5">
-            <label className={labelClass}>Slug <span className="normal-case font-normal text-muted">— booking URL</span></label>
+            <label className={labelClass}>Booking page address</label>
             <input
               value={slug}
               onChange={(e) => setSlug(slugify(e.target.value))}
               required
-              placeholder="southern-moto-school"
+              placeholder="city-yoga-studio"
               className={inputClass}
             />
-            {slug && <p className="text-xs text-secondary">/book/{slug}</p>}
+            {slug && <p className="text-xs text-secondary">Your booking page: /book/{slug}</p>}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -129,7 +129,7 @@ export default function NewSchoolForm() {
       )}
 
       <div className="flex items-center gap-3">
-        <Button type="submit" loading={submitting}>Create school</Button>
+        <Button type="submit" loading={submitting}>Create business</Button>
         <Button type="button" variant="secondary" onClick={() => router.back()}>Cancel</Button>
       </div>
 

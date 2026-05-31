@@ -45,7 +45,7 @@ export default function BookingTable({ bookings, onSelect }: Props) {
             </p>
           </div>
           <div className="hidden sm:block shrink-0">
-            <Badge variant="licence" value={b.licenceType} />
+            <Badge variant="session" value={b.sessionType} />
           </div>
           <Badge variant="status" value={b.status} />
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="shrink-0 text-muted">

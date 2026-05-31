@@ -1,10 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import type { AvailabilitySlot, LicenceType } from '@/types'
+import type { AvailabilitySlot } from '@/types'
 import SlotCard from '@/components/booking/SlotCard'
-
-const LICENCE_TYPES: LicenceType[] = ['CBT', 'A1', 'A2', 'DAS', 'Refresher']
 
 interface Props {
   slots: AvailabilitySlot[]
@@ -17,45 +15,43 @@ function formatDateHeading(isoDate: string): string {
 }
 
 export default function SlotList({ slots, onSelect }: Props) {
-  const [filter, setFilter] = useState<LicenceType | 'All'>('All')
+  const [filter, setFilter] = useState<string>('All')
 
-  const filtered = filter === 'All' ? slots : slots.filter((s) => s.licenceType === filter)
+  const presentTypes = [...new Set(slots.map((s) => s.sessionType).filter(Boolean))].sort()
+  const filtered = filter === 'All' ? slots : slots.filter((s) => s.sessionType === filter)
 
-  // Group by date
   const grouped = filtered.reduce<Record<string, AvailabilitySlot[]>>((acc, slot) => {
     if (!acc[slot.date]) acc[slot.date] = []
     acc[slot.date].push(slot)
     return acc
   }, {})
 
-  const presentTypes = new Set(slots.map((s) => s.licenceType))
-
   return (
     <div className="flex flex-col gap-6">
-      {/* Filter tabs */}
-      <div className="flex flex-wrap gap-2">
-        {(['All', ...LICENCE_TYPES.filter((l) => presentTypes.has(l))] as (LicenceType | 'All')[]).map((t) => (
-          <button
-            key={t}
-            onClick={() => setFilter(t)}
-            className={[
-              'rounded-full px-3 py-1 text-xs font-medium transition-colors',
-              filter === t
-                ? 'bg-accent text-white'
-                : 'bg-white border border-border text-secondary hover:text-ink',
-            ].join(' ')}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
+      {presentTypes.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {(['All', ...presentTypes]).map((t) => (
+            <button
+              key={t}
+              onClick={() => setFilter(t)}
+              className={[
+                'px-3 py-1 text-xs font-medium transition-colors',
+                filter === t
+                  ? 'bg-ink text-white'
+                  : 'bg-white border border-border text-secondary hover:text-ink',
+              ].join(' ')}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      )}
 
-      {/* Slot groups */}
       {Object.keys(grouped).length === 0 ? (
         <p className="text-sm text-secondary py-8 text-center">
           {filter === 'All'
-            ? 'No upcoming slots available right now. Check back soon.'
-            : `No available ${filter} slots. Try a different course type.`}
+            ? 'No upcoming sessions available right now. Check back soon.'
+            : `No available ${filter} sessions. Try a different type.`}
         </p>
       ) : (
         Object.entries(grouped)

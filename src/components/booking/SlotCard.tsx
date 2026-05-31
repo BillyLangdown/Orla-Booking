@@ -18,7 +18,7 @@ export default function SlotCard({ slot, onSelect }: Props) {
       <div className="flex items-center justify-between gap-4">
         <div className="flex flex-col gap-1.5 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant="licence" value={slot.licenceType} />
+            <Badge variant="session" value={slot.sessionType} />
             {almostFull && (
               <span className="text-xs font-medium text-amber-600">Last space</span>
             )}

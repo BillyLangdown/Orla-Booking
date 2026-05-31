@@ -13,7 +13,7 @@ export const resourceService = {
       id:       r.id as string,
       tenantId: r.tenant_id as string,
       name:     r.name as string,
-      type:     r.type as 'instructor' | 'bike',
+      type:     r.type as 'person' | 'asset',
     }))
   },
 }

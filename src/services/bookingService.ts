@@ -1,5 +1,5 @@
 import { adminSupabase as supabase } from '@/lib/supabase/admin'
-import type { Booking, BookingStatus, CreateBookingInput, LicenceType } from '@/types'
+import type { Booking, BookingStatus, CreateBookingInput } from '@/types'
 
 function isoToDate(iso: string): string {
   // Returns YYYY-MM-DD — safe: a 1-hour UTC offset never crosses midnight for typical slots
@@ -24,13 +24,13 @@ function mapBooking(row: Record<string, unknown>): Booking {
       date:        isoToDate(startIso),
       startTime:   isoToTime(startIso),
       endTime:     endIso ? isoToTime(endIso) : '',
-      licenceType: (row.licence_type as LicenceType) ?? 'CBT',
+      sessionType: (row.licence_type as string) ?? '',
     } : undefined,
     name:        (row.customer_name as string) ?? '',
     email:       (row.customer_email as string) ?? '',
     phone:       (row.customer_phone as string) ?? undefined,
     notes:       (row.notes as string) ?? undefined,
-    licenceType: (row.licence_type as LicenceType) ?? 'CBT',
+    sessionType: (row.licence_type as string) ?? '',
     intakeAnswers: (row.intake_answers as Record<string, string>) ?? {},
     createdAt:   row.created_at as string,
     status:      (row.status as BookingStatus) ?? 'confirmed',
@@ -93,7 +93,7 @@ export const bookingService = {
         customer_email: input.email,
         customer_phone: input.phone ?? null,
         notes:          input.notes ?? null,
-        licence_type:   input.licenceType,
+        licence_type:   input.sessionType,
         intake_answers: input.intakeAnswers,
         start_time:     input.startTime,
         end_time:       input.endTime,
