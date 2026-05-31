@@ -125,7 +125,7 @@ export default function BookingForm({ slot, tenantId, intakeQuestions, onBack, o
       name:          name.trim(),
       email:         email.trim().toLowerCase(),
       phone:         phone.trim() || undefined,
-      licenceType:   slot.licenceType,
+      sessionType:   slot.sessionType,
       intakeAnswers: Object.fromEntries(
         intakeQuestions.map(q => [q.label, answers[q.id] ?? ''])
           .filter(([, v]) => v !== '')

@@ -30,7 +30,7 @@ function CapacityBar({ booked, capacity }: { booked: number; capacity: number })
 export default function AvailabilityList({ slots }: Props) {
   if (slots.length === 0) {
     return (
-      <div className="rounded-xl border border-border bg-white py-16 text-center">
+      <div className="bg-white shadow-sm py-16 text-center">
         <p className="text-sm text-secondary">No availability slots configured.</p>
       </div>
     )
@@ -47,7 +47,7 @@ export default function AvailabilityList({ slots }: Props) {
       {Object.entries(grouped)
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([date, dateSlots]) => (
-          <div key={date} className="overflow-hidden rounded-xl border border-border bg-white">
+          <div key={date} className="bg-white shadow-sm overflow-hidden">
             <div className="border-b border-border bg-subtle px-5 py-3">
               <p className="text-xs font-semibold uppercase tracking-wide text-secondary">
                 {formatDateHeading(date)}
@@ -56,7 +56,7 @@ export default function AvailabilityList({ slots }: Props) {
             <ul className="divide-y divide-border">
               {dateSlots.map((slot) => (
                 <li key={slot.id} className="px-5 py-3.5 flex items-center gap-4 flex-wrap">
-                  <Badge variant="licence" value={slot.licenceType} />
+                  <Badge variant="session" value={slot.sessionType} />
                   <span className="text-sm text-ink font-medium">
                     {slot.startTime} – {slot.endTime}
                   </span>

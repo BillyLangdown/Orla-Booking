@@ -131,7 +131,7 @@ export default function CalendarView({ bookings, onSelect }: Props) {
                     <p className="text-xs text-secondary mt-0.5">{formatTime(b.slot.startTime)} – {formatTime(b.slot.endTime)}{b.resourceName ? ` · ${b.resourceName}` : ''}</p>
                   )}
                 </div>
-                <Badge variant="licence" value={b.licenceType} />
+                <Badge variant="session" value={b.sessionType} />
                 <Badge variant="status" value={b.status} />
               </div>
             ))

@@ -1,8 +1,8 @@
 export type TenantId = string
 
-export type LicenceType = 'CBT' | 'A1' | 'A2' | 'DAS' | 'Refresher'
+export type SessionType = string
 
-export type ResourceType = 'instructor' | 'bike'
+export type ResourceType = 'person' | 'asset'
 
 export type BookingStatus = 'confirmed' | 'pending' | 'cancelled'
 
@@ -25,6 +25,7 @@ export interface Tenant {
   logoUrl?: string
   theme?: string
   intakeQuestions: IntakeQuestion[]
+  sessionTypes: string[]
   onboardingCompleted: boolean
   autoConfirm: boolean
   branding: {
@@ -45,7 +46,7 @@ export interface AvailabilitySlot {
   tenantId: TenantId
   resourceId: string
   resource: Resource
-  licenceType: LicenceType
+  sessionType: SessionType
   date: string
   startTime: string
   endTime: string
@@ -57,12 +58,12 @@ export interface Booking {
   id: string
   tenantId: TenantId
   slotId: string
-  slot?: Pick<AvailabilitySlot, 'date' | 'startTime' | 'endTime' | 'licenceType'>
+  slot?: Pick<AvailabilitySlot, 'date' | 'startTime' | 'endTime' | 'sessionType'>
   name: string
   email: string
   phone?: string
   notes?: string
-  licenceType: LicenceType
+  sessionType: SessionType
   intakeAnswers: Record<string, string>
   createdAt: string
   status: BookingStatus
@@ -74,7 +75,7 @@ export interface Booking {
 export interface CreateSlotInput {
   tenantId: TenantId
   resourceId: string
-  licenceType: LicenceType
+  sessionType: SessionType
   date: string
   startTime: string
   endTime: string
@@ -92,6 +93,7 @@ export interface UpdateTenantInput {
   intakeQuestions?: IntakeQuestion[]
   onboardingCompleted?: boolean
   autoConfirm?: boolean
+  sessionTypes?: string[]
   primaryColor: string
   accentColor: string
 }
@@ -104,7 +106,7 @@ export interface CreateBookingInput {
   email: string
   phone?: string
   notes?: string
-  licenceType: LicenceType
+  sessionType: SessionType
   intakeAnswers: Record<string, string>
   startTime: string
   endTime: string

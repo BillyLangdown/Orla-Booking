@@ -77,7 +77,7 @@ export default function BookingDrawer({ booking, onClose }: Props) {
             <p className="text-lg font-bold text-ink leading-tight truncate">{booking?.name}</p>
             <div className="flex items-center gap-2 flex-wrap">
               {booking && <Badge variant="status" value={booking.status} />}
-              {booking && <Badge variant="licence" value={booking.licenceType} />}
+              {booking && <Badge variant="session" value={booking.sessionType} />}
             </div>
           </div>
           <button
@@ -104,7 +104,7 @@ export default function BookingDrawer({ booking, onClose }: Props) {
                   <Field label="Time">{booking.slot.startTime} – {booking.slot.endTime}</Field>
                 )}
                 {booking.resourceName && (
-                  <Field label="Instructor">{booking.resourceName}</Field>
+                  <Field label="Resource">{booking.resourceName}</Field>
                 )}
               </Section>
 

@@ -74,7 +74,7 @@ export default function IntakeBuilder({ questions, onChange }: Props) {
               <input
                 value={q.label}
                 onChange={(e) => update(q.id, { label: e.target.value })}
-                placeholder="Question text, e.g. What is your riding experience?"
+                placeholder="Question text, e.g. What is your experience level?"
                 className={`${inputClass} w-full`}
               />
               <div className="flex items-center gap-2 flex-wrap">

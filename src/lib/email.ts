@@ -49,8 +49,8 @@ export async function sendBookingConfirmation(
 
       <table style="width:100%;border-collapse:collapse;font-size:14px;">
         <tr style="border-bottom:1px solid #e2e8f0;">
-          <td style="padding:10px 0;color:#64748b;width:40%;">Course</td>
-          <td style="padding:10px 0;font-weight:500;">${booking.licenceType}</td>
+          <td style="padding:10px 0;color:#64748b;width:40%;">Session type</td>
+          <td style="padding:10px 0;font-weight:500;">${booking.sessionType}</td>
         </tr>
         <tr style="border-bottom:1px solid #e2e8f0;">
           <td style="padding:10px 0;color:#64748b;">Date</td>
@@ -68,7 +68,7 @@ export async function sendBookingConfirmation(
 
       ${contactLines ? `
       <div style="margin-top:24px;padding:16px;background:#f8fafc;border-radius:8px;font-size:13px;color:#64748b;">
-        <p style="margin:0 0 4px;font-weight:600;color:#0f172a;">Contact the school</p>
+        <p style="margin:0 0 4px;font-weight:600;color:#0f172a;">Contact the business</p>
         <p style="margin:0;white-space:pre-line;">${contactLines}</p>
       </div>` : ''}
     </div>
@@ -76,21 +76,21 @@ export async function sendBookingConfirmation(
 </body>
 </html>`
 
-  const text = `Booking confirmed — ${booking.licenceType} with ${tenant.name}
+  const text = `Booking confirmed — ${booking.sessionType} with ${tenant.name}
 
 Hi ${booking.name},
 
-Course: ${booking.licenceType}
+Session type: ${booking.sessionType}
 Date: ${start.date}
 Time: ${start.time} – ${end.time}
 Booking ref: ${booking.id}
 
-${contactLines ? `Contact the school:\n${contactLines}` : ''}`
+${contactLines ? `Contact the business:\n${contactLines}` : ''}`
 
     await resend.emails.send({
       from: FROM,
       to: booking.email,
-      subject: `Booking confirmed — ${booking.licenceType} with ${tenant.name}`,
+      subject: `Booking confirmed — ${booking.sessionType} with ${tenant.name}`,
       html,
       text,
     })
@@ -133,7 +133,7 @@ export async function sendAdminNotification(
       <p style="margin:4px 0 0;font-size:14px;color:rgba(255,255,255,0.8);">New booking received</p>
     </div>
     <div style="padding:28px;">
-      <h1 style="margin:0 0 8px;font-size:20px;font-weight:600;">New booking — ${booking.licenceType}</h1>
+      <h1 style="margin:0 0 8px;font-size:20px;font-weight:600;">New booking — ${booking.sessionType}</h1>
       <p style="margin:0 0 24px;color:#64748b;font-size:15px;">A customer has just booked a session.</p>
 
       <table style="width:100%;border-collapse:collapse;font-size:14px;">
@@ -151,8 +151,8 @@ export async function sendAdminNotification(
           <td style="padding:10px 0;font-weight:500;">${booking.phone}</td>
         </tr>` : ''}
         <tr style="border-bottom:1px solid #e2e8f0;">
-          <td style="padding:10px 0;color:#64748b;">Course</td>
-          <td style="padding:10px 0;font-weight:500;">${booking.licenceType}</td>
+          <td style="padding:10px 0;color:#64748b;">Session type</td>
+          <td style="padding:10px 0;font-weight:500;">${booking.sessionType}</td>
         </tr>
         <tr style="border-bottom:1px solid #e2e8f0;">
           <td style="padding:10px 0;color:#64748b;">Date</td>
@@ -187,11 +187,11 @@ export async function sendAdminNotification(
 </body>
 </html>`
 
-    const text = `New booking — ${booking.licenceType}
+    const text = `New booking — ${booking.sessionType}
 
 Customer: ${booking.name}
 Email: ${booking.email}
-${booking.phone ? `Phone: ${booking.phone}\n` : ''}Course: ${booking.licenceType}
+${booking.phone ? `Phone: ${booking.phone}\n` : ''}Session type: ${booking.sessionType}
 Date: ${start.date}
 Time: ${start.time} – ${end.time}
 Status: Confirmed
@@ -201,7 +201,7 @@ ${booking.notes ? `\nNotes: ${booking.notes}` : ''}`
     await resend.emails.send({
       from: FROM,
       to: tenant.email,
-      subject: `New booking — ${booking.name} (${booking.licenceType})`,
+      subject: `New booking — ${booking.name} (${booking.sessionType})`,
       html,
       text,
     })

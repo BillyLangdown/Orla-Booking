@@ -1,5 +1,5 @@
 import { adminSupabase as supabase } from '@/lib/supabase/admin'
-import type { AvailabilitySlot, CreateSlotInput, LicenceType } from '@/types'
+import type { AvailabilitySlot, CreateSlotInput } from '@/types'
 
 // start_time / end_time are stored as TIMESTAMP in Supabase.
 // We derive the ISO date and HH:mm time strings from them.
@@ -24,9 +24,9 @@ function mapSlot(row: Record<string, unknown>): AvailabilitySlot {
       id:       resource?.id as string ?? row.resource_id as string,
       tenantId: row.tenant_id as string,
       name:     resource?.name as string ?? 'Unknown',
-      type:     (resource?.type as 'instructor' | 'bike') ?? 'instructor',
+      type:     (resource?.type as 'person' | 'asset') ?? 'person',
     },
-    licenceType: (row.licence_type as LicenceType) ?? 'CBT',
+    sessionType: (row.session_type as string) ?? '',
     date,
     startTime,
     endTime,
@@ -82,7 +82,7 @@ export const availabilityService = {
     const { error } = await supabase.from('availability_slots').insert({
       tenant_id:    input.tenantId,
       resource_id:  input.resourceId,
-      licence_type: input.licenceType,
+      session_type: input.sessionType,
       start_time:   startTimestamp,
       end_time:     endTimestamp,
       capacity:     input.capacity,
@@ -99,5 +99,18 @@ export const availabilityService = {
       .eq('id', slotId)
 
     if (error) throw new Error(error.message)
+  },
+
+  async getDistinctSessionTypes(tenantId: string): Promise<string[]> {
+    const { data, error } = await supabase
+      .from('availability_slots')
+      .select('session_type')
+      .eq('tenant_id', tenantId)
+
+    if (error || !data) return []
+    const types = (data as { session_type: string }[])
+      .map((r) => r.session_type)
+      .filter(Boolean)
+    return [...new Set(types)].sort()
   },
 }
