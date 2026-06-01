@@ -134,12 +134,30 @@ export async function sendAdminNotification(
       : '<span style="display:inline-block;padding:2px 10px;background:#dcfce7;color:#166534;border-radius:999px;font-size:12px;font-weight:600;">Confirmed</span>'
 
     const actionButtons = isPending ? `
-      <div style="margin-top:28px;display:flex;gap:12px;flex-wrap:wrap;">
-        <a href="${appUrl}/api/booking/${booking.id}/confirm" style="display:inline-block;padding:12px 24px;background:#16a34a;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;">Confirm booking ✓</a>
-        <a href="${appUrl}/api/booking/${booking.id}/deny" style="display:inline-block;padding:12px 24px;background:#ffffff;color:#dc2626;text-decoration:none;border:1px solid #dc2626;font-size:14px;font-weight:600;">Deny booking ✗</a>
+      <div style="margin-top:32px;border-top:1px solid #e2e8f0;padding-top:24px;">
+        <p style="margin:0 0 14px;font-size:13px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;">Action required</p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="padding-right:6px;">
+              <a href="${appUrl}/api/booking/${booking.id}/confirm"
+                style="display:block;padding:14px 20px;background:#16a34a;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;text-align:center;border-radius:8px;">
+                ✓&nbsp;&nbsp;Confirm booking
+              </a>
+            </td>
+            <td style="padding-left:6px;">
+              <a href="${appUrl}/api/booking/${booking.id}/deny"
+                style="display:block;padding:14px 20px;background:#fef2f2;color:#dc2626;text-decoration:none;font-size:14px;font-weight:600;text-align:center;border-radius:8px;border:1px solid #fecaca;">
+                ✕&nbsp;&nbsp;Deny booking
+              </a>
+            </td>
+          </tr>
+        </table>
       </div>` : `
       <div style="margin-top:28px;">
-        <a href="${appUrl}/dashboard/bookings" style="display:inline-block;padding:12px 24px;background:${accentColor};color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;">View in dashboard →</a>
+        <a href="${appUrl}/dashboard/bookings"
+          style="display:inline-block;padding:12px 24px;background:${accentColor};color:#ffffff;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;">
+          View in dashboard →
+        </a>
       </div>`
 
     const html = `
