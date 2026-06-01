@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, FormEvent } from 'react'
+import { useState, useRef, useEffect, FormEvent } from 'react'
 import type { IntakeQuestion, Resource, Tenant, UpdateTenantInput } from '@/types'
 import { updateTenantAction, saveIntakeQuestionsAction, createResourceAction, deleteResourceAction } from '@/app/actions'
 import Button from '@/components/ui/Button'
@@ -36,6 +36,18 @@ export default function SettingsForm({ tenant, slotSessionTypes = [], resources:
   const [savingQ, setSavingQ] = useState(false)
   const [savedQ, setSavedQ]   = useState(false)
   const [error, setError]     = useState<string | null>(null)
+
+  const tabsRef = useRef<HTMLDivElement>(null)
+  const [tabsHasMore, setTabsHasMore] = useState(false)
+  useEffect(() => {
+    const el = tabsRef.current
+    if (!el) return
+    const check = () => setTabsHasMore(el.scrollLeft + el.clientWidth < el.scrollWidth - 2)
+    check()
+    el.addEventListener('scroll', check, { passive: true })
+    window.addEventListener('resize', check)
+    return () => { el.removeEventListener('scroll', check); window.removeEventListener('resize', check) }
+  }, [])
 
   const [resources, setResources] = useState<Resource[]>(initialResources)
   const [resNames, setResNames]   = useState<Record<string, string>>({ staff: '', location: '', resource: '' })
@@ -99,23 +111,32 @@ export default function SettingsForm({ tenant, slotSessionTypes = [], resources:
     <div className="flex flex-col gap-5">
 
       {/* Tab nav — scrollable on mobile */}
-      <div className="overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] border-b border-border">
-        <div className="flex min-w-max">
-          {TABS.map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => setTab(t)}
-              className={[
-                'relative px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap',
-                tab === t ? 'text-ink' : 'text-secondary hover:text-ink',
-              ].join(' ')}
-            >
-              {t}
-              {tab === t && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-ink" />}
-            </button>
-          ))}
+      <div className="relative border-b border-border">
+        <div ref={tabsRef} className="overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className="flex min-w-max">
+            {TABS.map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setTab(t)}
+                className={[
+                  'relative px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap',
+                  tab === t ? 'text-ink' : 'text-secondary hover:text-ink',
+                ].join(' ')}
+              >
+                {t}
+                {tab === t && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-ink" />}
+              </button>
+            ))}
+          </div>
         </div>
+        {tabsHasMore && (
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 bg-white border-l border-border/50">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
+              <path d="M6 12l4-4-4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-secondary"/>
+            </svg>
+          </div>
+        )}
       </div>
 
       {/* ── Business ── */}
