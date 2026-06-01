@@ -98,9 +98,8 @@ export default function SettingsForm({ tenant, slotSessionTypes = [], resources:
   return (
     <div className="flex flex-col gap-5">
 
-      {/* Tab nav — scrollable on mobile, right-fade peek affordance */}
-      <div className="relative border-b border-border">
-        <div className="overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      {/* Tab nav — scrollable on mobile */}
+      <div className="overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] border-b border-border">
         <div className="flex min-w-max">
           {TABS.map((t) => (
             <button
@@ -117,8 +116,6 @@ export default function SettingsForm({ tenant, slotSessionTypes = [], resources:
             </button>
           ))}
         </div>
-        </div>
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-white to-transparent" />
       </div>
 
       {/* ── Business ── */}
