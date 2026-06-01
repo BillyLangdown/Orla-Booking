@@ -131,9 +131,9 @@ export default function SettingsForm({ tenant, slotSessionTypes = [], resources:
           </div>
         </div>
         {tabsHasMore && (
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 bg-white border-l border-border/50">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
-              <path d="M6 12l4-4-4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-secondary"/>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden>
+              <path d="M6 12l4-4-4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-muted"/>
             </svg>
           </div>
         )}
