@@ -14,7 +14,7 @@ export async function createBookingAction(
 ): Promise<{ booking?: Booking; error?: string }> {
   try {
     const tenant = await tenantService.getTenantById(input.tenantId)
-    const autoConfirm = tenant?.autoConfirm !== false
+    const autoConfirm = tenant?.autoConfirm === true
     const booking = await bookingService.createBooking({ ...input, status: autoConfirm ? 'confirmed' : 'pending' })
 
     void (async () => {

@@ -16,7 +16,7 @@ function mapTenant(row: Record<string, unknown>): Tenant {
     intakeQuestions: (row.intake_questions as IntakeQuestion[]) ?? [],
     sessionTypes: (b.session_types as unknown as string[]) ?? [],
     onboardingCompleted: (row.onboarding_completed as boolean) ?? false,
-    autoConfirm: (b.auto_confirm as unknown as boolean) !== false,
+    autoConfirm: (b.auto_confirm as unknown as boolean) === true,
     branding: {
       primaryColor: b.primary_color ?? b.primaryColor ?? '#1e293b',
       accentColor:  b.accent_color  ?? b.accentColor  ?? '#f97316',
@@ -79,7 +79,7 @@ export const tenantService = {
         accent_color:  input.accentColor,
         logo_url:      input.logoUrl ?? null,
         theme:         input.theme ?? null,
-        auto_confirm:  input.autoConfirm !== false,
+        auto_confirm:  input.autoConfirm === true,
         session_types: input.sessionTypes ?? null,
       },
     }
