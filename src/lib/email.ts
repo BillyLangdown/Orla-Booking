@@ -7,6 +7,9 @@ const resend = process.env.RESEND_API_KEY
 
 const FROM = process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev'
 
+if (!process.env.RESEND_API_KEY) console.warn('[email] RESEND_API_KEY is not set — emails will not send')
+if (!process.env.RESEND_FROM_EMAIL) console.warn('[email] RESEND_FROM_EMAIL is not set — falling back to onboarding@resend.dev (test only)')
+
 function formatISODate(iso: string) {
   const d = new Date(iso)
   return {
@@ -22,7 +25,7 @@ export async function sendBookingConfirmation(
   tenant: Tenant,
 ): Promise<void> {
   try {
-  if (!resend) return
+    if (!resend) { console.warn('[email] sendBookingConfirmation skipped — no Resend client'); return }
 
   const start = formatISODate(startTime)
   const end   = formatISODate(endTime)
@@ -87,13 +90,15 @@ Booking ref: ${booking.id}
 
 ${contactLines ? `Contact the business:\n${contactLines}` : ''}`
 
-    await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: FROM,
       to: booking.email,
       subject: `Booking confirmed — ${booking.sessionType} with ${tenant.name}`,
       html,
       text,
     })
+    if (error) console.error('[email] Confirmation send failed:', error)
+    else console.log('[email] Confirmation sent:', data?.id, '→', booking.email)
   } catch (err) {
     console.error('[email] Failed to send confirmation:', err)
   }
@@ -106,7 +111,8 @@ export async function sendAdminNotification(
   tenant: Tenant,
 ): Promise<void> {
   try {
-    if (!resend || !tenant.email) return
+    if (!resend) { console.warn('[email] sendAdminNotification skipped — no Resend client'); return }
+    if (!tenant.email) { console.warn('[email] sendAdminNotification skipped — tenant has no email address'); return }
 
     const start = formatISODate(startTime)
     const end   = formatISODate(endTime)
@@ -211,7 +217,7 @@ Booking ref: ${booking.id}
 ${booking.notes ? `\nNotes: ${booking.notes}` : ''}
 ${isPending ? `\nConfirm: ${appUrl}/api/booking/${booking.id}/confirm\nDeny: ${appUrl}/api/booking/${booking.id}/deny` : ''}`
 
-    await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: FROM,
       to: tenant.email,
       subject: isPending
@@ -220,6 +226,8 @@ ${isPending ? `\nConfirm: ${appUrl}/api/booking/${booking.id}/confirm\nDeny: ${a
       html,
       text,
     })
+    if (error) console.error('[email] Admin notification send failed:', error)
+    else console.log('[email] Admin notification sent:', data?.id, '→', tenant.email)
   } catch (err) {
     console.error('[email] Failed to send admin notification:', err)
   }
@@ -296,13 +304,15 @@ Time: ${start.time} – ${end.time}
 Please get in touch if you'd like to arrange an alternative time.
 ${contactLines ? `\nContact us:\n${contactLines}` : ''}`
 
-    await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: FROM,
       to: booking.email,
       subject: `Booking update — ${booking.sessionType} with ${tenant.name}`,
       html,
       text,
     })
+    if (error) console.error('[email] Decline notification send failed:', error)
+    else console.log('[email] Decline notification sent:', data?.id, '→', booking.email)
   } catch (err) {
     console.error('[email] Failed to send decline notification:', err)
   }
