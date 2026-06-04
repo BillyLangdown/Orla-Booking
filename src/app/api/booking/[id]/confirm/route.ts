@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { bookingService } from '@/services/bookingService'
 import { tenantService } from '@/services/tenantService'
+import { adminSupabase } from '@/lib/supabase/admin'
 import { sendBookingConfirmation } from '@/lib/email'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL
@@ -21,8 +22,17 @@ export async function GET(
     const confirmed = await bookingService.confirmBooking(id)
     const tenant = await tenantService.getTenantById(confirmed.tenantId)
 
-    if (tenant && confirmed.startTimeIso && confirmed.endTimeIso) {
-      await sendBookingConfirmation(confirmed, confirmed.startTimeIso, confirmed.endTimeIso, tenant)
+    let startTime = confirmed.startTimeIso
+    let endTime   = confirmed.endTimeIso
+    if ((!startTime || !endTime) && confirmed.slotId) {
+      const { data: slot } = await adminSupabase
+        .from('availability_slots').select('start_time, end_time').eq('id', confirmed.slotId).single()
+      startTime = slot?.start_time as string ?? startTime
+      endTime   = slot?.end_time   as string ?? endTime
+    }
+
+    if (tenant && startTime && endTime) {
+      await sendBookingConfirmation(confirmed, startTime, endTime, tenant)
     }
 
     return page(

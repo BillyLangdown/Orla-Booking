@@ -12,12 +12,6 @@ function isoToTime(iso: string): string {
   return iso.slice(11, 16)
 }
 
-function fillTimesFromSlot(row: Record<string, unknown>): void {
-  const slot = row.availability_slots as { start_time?: string; end_time?: string } | null
-  if (!row.start_time && slot?.start_time) row.start_time = slot.start_time
-  if (!row.end_time && slot?.end_time) row.end_time = slot.end_time
-}
-
 function mapBooking(row: Record<string, unknown>): Booking {
   const startIso = row.start_time as string | null | undefined
   const endIso   = row.end_time   as string | null | undefined
@@ -80,14 +74,12 @@ export const bookingService = {
   async getBookingById(id: string): Promise<Booking | null> {
     const { data, error } = await supabase
       .from('bookings')
-      .select('*, availability_slots!slot_id(start_time, end_time)')
+      .select('*')
       .eq('id', id)
       .single()
 
     if (error || !data) return null
-    const row = data as Record<string, unknown>
-    fillTimesFromSlot(row)
-    return mapBooking(row)
+    return mapBooking(data as Record<string, unknown>)
   },
 
   async createBooking(input: CreateBookingInput): Promise<Booking> {
@@ -154,12 +146,10 @@ export const bookingService = {
       .from('bookings')
       .update({ status: 'confirmed' })
       .eq('id', bookingId)
-      .select('*, availability_slots!slot_id(start_time, end_time)')
+      .select('*')
       .single()
 
     if (error || !data) throw new Error(error?.message ?? 'Failed to confirm booking')
-    const row = data as Record<string, unknown>
-    fillTimesFromSlot(row)
-    return mapBooking(row)
+    return mapBooking(data as Record<string, unknown>)
   },
 }

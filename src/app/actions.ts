@@ -6,8 +6,25 @@ import { bookingService } from '@/services/bookingService'
 import { availabilityService } from '@/services/availabilityService'
 import { tenantService } from '@/services/tenantService'
 import { resourceService } from '@/services/resourceService'
+import { adminSupabase } from '@/lib/supabase/admin'
 import { sendBookingConfirmation, sendAdminNotification } from '@/lib/email'
 import type { Booking, CreateBookingInput, CreateSlotInput, IntakeQuestion, UpdateTenantInput } from '@/types'
+
+async function resolveBookingTimes(booking: Booking): Promise<{ startTime: string; endTime: string } | null> {
+  if (booking.startTimeIso && booking.endTimeIso) {
+    return { startTime: booking.startTimeIso, endTime: booking.endTimeIso }
+  }
+  // Times missing on booking row — fetch directly from the slot
+  const { data: slot } = await adminSupabase
+    .from('availability_slots')
+    .select('start_time, end_time')
+    .eq('id', booking.slotId)
+    .single()
+  if (slot?.start_time && slot?.end_time) {
+    return { startTime: slot.start_time as string, endTime: slot.end_time as string }
+  }
+  return null
+}
 
 export async function createBookingAction(
   input: CreateBookingInput,
@@ -44,9 +61,12 @@ export async function confirmBookingAction(bookingId: string): Promise<{ error?:
   try {
     const booking = await bookingService.confirmBooking(bookingId)
     try {
-      const tenant = await tenantService.getTenantById(booking.tenantId)
-      if (tenant && booking.startTimeIso && booking.endTimeIso) {
-        await sendBookingConfirmation(booking, booking.startTimeIso, booking.endTimeIso, tenant)
+      const [tenant, times] = await Promise.all([
+        tenantService.getTenantById(booking.tenantId),
+        resolveBookingTimes(booking),
+      ])
+      if (tenant && times) {
+        await sendBookingConfirmation(booking, times.startTime, times.endTime, tenant)
       }
     } catch {
       // email failures are non-fatal to the confirm action
