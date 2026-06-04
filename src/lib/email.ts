@@ -1,6 +1,5 @@
 import { Resend } from 'resend'
 import type { Booking, Tenant } from '@/types'
-import { googleCalendarUrl } from '@/lib/ics'
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -37,17 +36,6 @@ export async function sendBookingConfirmation(
   ].filter(Boolean).join('\n')
 
   const accentColor = tenant.branding?.accentColor ?? '#0f172a'
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL
-    ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
-
-  const gcalUrl = googleCalendarUrl({
-    summary: `${booking.sessionType} – ${tenant.name}`,
-    description: `Booking with ${tenant.name}. Ref: ${booking.id}`,
-    location: tenant.address || undefined,
-    startIso: startTime,
-    endIso: endTime,
-  })
-
   const html = `
 <!DOCTYPE html>
 <html>
@@ -86,25 +74,6 @@ export async function sendBookingConfirmation(
         <p style="margin:0;white-space:pre-line;">${contactLines}</p>
       </div>` : ''}
 
-      <div style="margin-top:24px;border-top:1px solid #e2e8f0;padding-top:20px;">
-        <p style="margin:0 0 12px;font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;">Add to calendar</p>
-        <table cellpadding="0" cellspacing="0" border="0">
-          <tr>
-            <td style="padding-right:8px;">
-              <a href="${gcalUrl}" target="_blank"
-                style="display:inline-block;padding:10px 16px;background:#ffffff;color:#0f172a;text-decoration:none;border-radius:6px;font-size:13px;font-weight:600;border:1.5px solid #e2e8f0;">
-                Google Calendar
-              </a>
-            </td>
-            <td>
-              <a href="${appUrl}/api/booking/${booking.id}/ics"
-                style="display:inline-block;padding:10px 16px;background:#ffffff;color:#0f172a;text-decoration:none;border-radius:6px;font-size:13px;font-weight:600;border:1.5px solid #e2e8f0;">
-                Apple / Outlook
-              </a>
-            </td>
-          </tr>
-        </table>
-      </div>
     </div>
   </div>
 </body>
@@ -151,14 +120,6 @@ export async function sendAdminNotification(
     const appUrl = process.env.NEXT_PUBLIC_APP_URL
       ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
 
-    const gcalUrl = googleCalendarUrl({
-      summary: `${booking.sessionType} – ${booking.name}`,
-      description: `Customer: ${booking.name} (${booking.email}). Ref: ${booking.id}`,
-      location: tenant.address || undefined,
-      startIso: startTime,
-      endIso: endTime,
-    })
-
     const isPending = booking.status === 'pending'
     const intakeRows = booking.intakeAnswers && Object.keys(booking.intakeAnswers).length > 0
       ? Object.entries(booking.intakeAnswers).map(([q, a]) => `
@@ -172,27 +133,6 @@ export async function sendAdminNotification(
       ? '<span style="display:inline-block;padding:2px 10px;background:#fef9c3;color:#854d0e;border-radius:999px;font-size:12px;font-weight:600;">Pending review</span>'
       : '<span style="display:inline-block;padding:2px 10px;background:#dcfce7;color:#166534;border-radius:999px;font-size:12px;font-weight:600;">Confirmed</span>'
 
-    const calendarSection = `
-      <div style="margin-top:20px;padding-top:20px;border-top:1px solid #e2e8f0;">
-        <p style="margin:0 0 12px;font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;">Add to calendar</p>
-        <table cellpadding="0" cellspacing="0" border="0">
-          <tr>
-            <td style="padding-right:8px;">
-              <a href="${gcalUrl}" target="_blank"
-                style="display:inline-block;padding:10px 16px;background:#ffffff;color:#0f172a;text-decoration:none;border-radius:6px;font-size:13px;font-weight:600;border:1.5px solid #e2e8f0;">
-                Google Calendar
-              </a>
-            </td>
-            <td>
-              <a href="${appUrl}/api/booking/${booking.id}/ics"
-                style="display:inline-block;padding:10px 16px;background:#ffffff;color:#0f172a;text-decoration:none;border-radius:6px;font-size:13px;font-weight:600;border:1.5px solid #e2e8f0;">
-                Apple / Outlook
-              </a>
-            </td>
-          </tr>
-        </table>
-      </div>`
-
     const actionButtons = isPending ? `
       <div style="margin-top:32px;border-top:1px solid #e2e8f0;padding-top:24px;">
         <p style="margin:0 0 16px;font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;">Action required</p>
@@ -204,14 +144,12 @@ export async function sendAdminNotification(
           style="display:block;padding:15px 20px;background:#ffffff;color:#64748b;text-decoration:none;font-size:14px;font-weight:500;text-align:center;border-radius:8px;border:1.5px solid #e2e8f0;">
           Decline booking
         </a>
-        ${calendarSection}
       </div>` : `
       <div style="margin-top:28px;">
         <a href="${appUrl}/dashboard/bookings"
           style="display:block;padding:15px 20px;background:#0f172a;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;text-align:center;border-radius:8px;">
           View in dashboard
         </a>
-        ${calendarSection}
       </div>`
 
     const html = `

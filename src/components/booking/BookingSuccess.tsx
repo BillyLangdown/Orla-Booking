@@ -1,7 +1,6 @@
 'use client'
 
 import type { Booking, Tenant } from '@/types'
-import { googleCalendarUrl } from '@/lib/ics'
 import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
 
@@ -13,16 +12,6 @@ interface Props {
 
 export default function BookingSuccess({ booking, tenant, onBookAnother }: Props) {
   const isPending = booking.status === 'pending'
-
-  const gcalUrl = booking.startTimeIso && booking.endTimeIso
-    ? googleCalendarUrl({
-        summary: `${booking.sessionType} – ${tenant.name}`,
-        description: `Booking with ${tenant.name}. Ref: ${booking.id}`,
-        location: tenant.address || undefined,
-        startIso: booking.startTimeIso,
-        endIso: booking.endTimeIso,
-      })
-    : null
 
   return (
     <div className="flex flex-col items-center text-center gap-6 py-8">
@@ -73,35 +62,6 @@ export default function BookingSuccess({ booking, tenant, onBookAnother }: Props
           <Badge variant="status" value={booking.status} />
         </div>
       </div>
-
-      {!isPending && (
-        <div className="w-full flex flex-col gap-2">
-          {gcalUrl && (
-            <a
-              href={gcalUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-2 border border-border bg-white px-4 py-3 text-sm font-medium text-ink hover:bg-gray-50 transition-colors"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-                <rect x="3" y="4" width="18" height="17" rx="2" stroke="currentColor" strokeWidth="1.5"/>
-                <path d="M3 9h18M8 2v4M16 2v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-              </svg>
-              Google Calendar
-            </a>
-          )}
-          <a
-            href={`/api/booking/${booking.id}/ics`}
-            className="w-full flex items-center justify-center gap-2 border border-border bg-white px-4 py-3 text-sm font-medium text-ink hover:bg-gray-50 transition-colors"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <rect x="3" y="4" width="18" height="17" rx="2" stroke="currentColor" strokeWidth="1.5"/>
-              <path d="M3 9h18M8 2v4M16 2v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-            Apple / Outlook
-          </a>
-        </div>
-      )}
 
       <Button variant="secondary" onClick={onBookAnother}>
         Book another slot
