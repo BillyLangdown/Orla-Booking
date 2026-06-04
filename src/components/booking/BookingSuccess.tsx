@@ -1,13 +1,29 @@
-import type { Booking } from '@/types'
+'use client'
+
+import type { Booking, Tenant } from '@/types'
+import { googleCalendarUrl } from '@/lib/ics'
 import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
 
 interface Props {
   booking: Booking
+  tenant: Pick<Tenant, 'name' | 'address'>
   onBookAnother: () => void
 }
 
-export default function BookingSuccess({ booking, onBookAnother }: Props) {
+export default function BookingSuccess({ booking, tenant, onBookAnother }: Props) {
+  const isPending = booking.status === 'pending'
+
+  const gcalUrl = booking.startTimeIso && booking.endTimeIso
+    ? googleCalendarUrl({
+        summary: `${booking.sessionType} – ${tenant.name}`,
+        description: `Booking with ${tenant.name}. Ref: ${booking.id}`,
+        location: tenant.address || undefined,
+        startIso: booking.startTimeIso,
+        endIso: booking.endTimeIso,
+      })
+    : null
+
   return (
     <div className="flex flex-col items-center text-center gap-6 py-8">
       <div className="flex h-14 w-14 items-center justify-center bg-emerald-100">
@@ -24,9 +40,14 @@ export default function BookingSuccess({ booking, onBookAnother }: Props) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <h2 className="text-xl font-semibold text-ink">Booking confirmed!</h2>
+        <h2 className="text-xl font-semibold text-ink">
+          {isPending ? 'Request sent!' : 'Booking confirmed!'}
+        </h2>
         <p className="text-sm text-secondary max-w-xs">
-          A confirmation email has been sent to <strong>{booking.email}</strong>.
+          {isPending
+            ? <>Your request has been sent to <strong>{tenant.name}</strong>. You&apos;ll receive a confirmation email once it&apos;s approved.</>
+            : <>A confirmation email with a calendar invite has been sent to <strong>{booking.email}</strong>.</>
+          }
         </p>
       </div>
 
@@ -52,6 +73,21 @@ export default function BookingSuccess({ booking, onBookAnother }: Props) {
           <Badge variant="status" value={booking.status} />
         </div>
       </div>
+
+      {gcalUrl && !isPending && (
+        <a
+          href={gcalUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full flex items-center justify-center gap-2 border border-border bg-white px-4 py-3 text-sm font-medium text-ink hover:bg-gray-50 transition-colors"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <rect x="3" y="4" width="18" height="17" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+            <path d="M3 9h18M8 2v4M16 2v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+          Add to Google Calendar
+        </a>
+      )}
 
       <Button variant="secondary" onClick={onBookAnother}>
         Book another slot

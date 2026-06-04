@@ -1,5 +1,6 @@
 import { Resend } from 'resend'
 import type { Booking, Tenant } from '@/types'
+import { generateICS, googleCalendarUrl } from '@/lib/ics'
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -36,6 +37,25 @@ export async function sendBookingConfirmation(
   ].filter(Boolean).join('\n')
 
   const accentColor = tenant.branding?.accentColor ?? '#0f172a'
+
+  const icsContent = generateICS({
+    uid: booking.id,
+    summary: `${booking.sessionType} – ${tenant.name}`,
+    description: `Booking with ${tenant.name}. Ref: ${booking.id}`,
+    location: tenant.address || undefined,
+    startIso: startTime,
+    endIso: endTime,
+    organizerName: tenant.name,
+    organizerEmail: tenant.email || FROM,
+  })
+
+  const gcalUrl = googleCalendarUrl({
+    summary: `${booking.sessionType} – ${tenant.name}`,
+    description: `Booking with ${tenant.name}. Ref: ${booking.id}`,
+    location: tenant.address || undefined,
+    startIso: startTime,
+    endIso: endTime,
+  })
 
   const html = `
 <!DOCTYPE html>
@@ -74,6 +94,15 @@ export async function sendBookingConfirmation(
         <p style="margin:0 0 4px;font-weight:600;color:#0f172a;">Contact the business</p>
         <p style="margin:0;white-space:pre-line;">${contactLines}</p>
       </div>` : ''}
+
+      <div style="margin-top:24px;border-top:1px solid #e2e8f0;padding-top:20px;">
+        <p style="margin:0 0 12px;font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;">Add to your calendar</p>
+        <a href="${gcalUrl}" target="_blank"
+          style="display:inline-block;padding:10px 18px;background:#4285f4;color:#ffffff;text-decoration:none;border-radius:6px;font-size:13px;font-weight:600;">
+          &#128197;&nbsp; Google Calendar
+        </a>
+        <p style="margin:10px 0 0;font-size:12px;color:#94a3b8;">The .ics file attached to this email works with Apple Calendar and Outlook.</p>
+      </div>
     </div>
   </div>
 </body>
@@ -96,6 +125,11 @@ ${contactLines ? `Contact the business:\n${contactLines}` : ''}`
       subject: `Booking confirmed — ${booking.sessionType} with ${tenant.name}`,
       html,
       text,
+      attachments: [{
+        filename: 'booking.ics',
+        content: Buffer.from(icsContent, 'utf-8'),
+        contentType: 'text/calendar; charset=utf-8; method=REQUEST',
+      }],
     })
     if (error) console.error('[email] Confirmation send failed:', error)
     else console.log('[email] Confirmation sent:', data?.id, '→', booking.email)

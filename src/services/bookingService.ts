@@ -83,6 +83,12 @@ export const bookingService = {
   },
 
   async createBooking(input: CreateBookingInput): Promise<Booking> {
+    // Atomically reserve a seat. Returns false if slot is already full.
+    const { data: claimed, error: claimError } = await supabase
+      .rpc('claim_slot', { p_slot_id: input.slotId })
+    if (claimError) throw new Error(`Unable to reserve slot: ${claimError.message}`)
+    if (!claimed) throw new Error('This slot is fully booked. Please go back and choose another time.')
+
     const { data, error } = await supabase
       .from('bookings')
       .insert({
@@ -102,7 +108,12 @@ export const bookingService = {
       .select()
       .single()
 
-    if (error || !data) throw new Error(error?.message ?? 'Failed to create booking')
+    if (error || !data) {
+      // Roll back the claimed seat if the insert failed
+      void supabase.rpc('release_slot', { p_slot_id: input.slotId })
+      throw new Error(error?.message ?? 'Failed to create booking')
+    }
+
     return mapBooking(data as Record<string, unknown>)
   },
 

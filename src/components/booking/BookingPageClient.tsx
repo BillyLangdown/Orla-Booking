@@ -74,6 +74,7 @@ export default function BookingPageClient({ tenant, slots }: Props) {
         {view === 'success' && confirmedBooking && (
           <BookingSuccess
             booking={confirmedBooking}
+            tenant={tenant}
             onBookAnother={() => { setSelectedSlot(null); setConfirmedBooking(null); setView('slots') }}
           />
         )}
