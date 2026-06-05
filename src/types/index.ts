@@ -4,7 +4,16 @@ export type SessionType = string
 
 export type ResourceType = 'staff' | 'location' | 'resource'
 
-export type BookingStatus = 'confirmed' | 'pending' | 'cancelled'
+export type BookingStatus = 'confirmed' | 'pending' | 'cancelled' | 'awaiting_payment'
+
+export type PaymentMode = 'none' | 'full' | 'deposit'
+
+export interface SessionTypePrice {
+  price:         number
+  depositAmount: number
+}
+
+export type SessionTypePrices = Record<string, SessionTypePrice>
 
 export interface IntakeQuestion {
   id: string
@@ -32,6 +41,12 @@ export interface Tenant {
     primaryColor: string
     accentColor: string
   }
+  stripeAccountId?: string
+  stripeOnboarded: boolean
+  paymentMode: PaymentMode
+  sessionTypePrices: SessionTypePrices
+  currency: string
+  showPricesOnBookingPage: boolean
 }
 
 export interface Resource {
@@ -70,6 +85,8 @@ export interface Booking {
   startTimeIso?: string
   endTimeIso?: string
   resourceName?: string
+  stripePaymentIntentId?: string
+  amountPaid?: number
 }
 
 export interface CreateSlotInput {

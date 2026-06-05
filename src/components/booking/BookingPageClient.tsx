@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import type { AvailabilitySlot, Booking, Tenant } from '@/types'
 import SlotView from '@/components/booking/SlotView'
 import BookingForm from '@/components/booking/BookingForm'
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export default function BookingPageClient({ tenant, slots }: Props) {
+  const router = useRouter()
   const [view, setView]                       = useState<View>('slots')
   const [selectedSlot, setSelectedSlot]       = useState<AvailabilitySlot | null>(null)
   const [confirmedBooking, setConfirmedBooking] = useState<Booking | null>(null)
@@ -57,7 +59,16 @@ export default function BookingPageClient({ tenant, slots }: Props) {
                 <p className="text-sm text-secondary mt-1 leading-relaxed">{tenant.description}</p>
               )}
             </div>
-            <SlotView slots={slots} onSelect={handleSelectSlot} />
+            <SlotView
+              slots={slots}
+              pricing={{
+                show:     tenant.showPricesOnBookingPage,
+                mode:     tenant.paymentMode,
+                prices:   tenant.sessionTypePrices,
+                currency: tenant.currency,
+              }}
+              onSelect={handleSelectSlot}
+            />
           </>
         )}
 
@@ -75,7 +86,13 @@ export default function BookingPageClient({ tenant, slots }: Props) {
           <BookingSuccess
             booking={confirmedBooking}
             tenant={tenant}
-            onBookAnother={() => { setSelectedSlot(null); setConfirmedBooking(null); setView('slots') }}
+            slot={selectedSlot ?? undefined}
+            onBookAnother={() => {
+              setSelectedSlot(null)
+              setConfirmedBooking(null)
+              setView('slots')
+              router.refresh()
+            }}
           />
         )}
       </main>

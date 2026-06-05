@@ -92,7 +92,7 @@ export default function IntakeBuilder({ questions, onChange }: Props) {
             className={fieldCls}
           />
 
-          {/* Type + Required — type full-width, required below */}
+          {/* Type + Required - type full-width, required below */}
           <div className="flex flex-col gap-2">
             <select
               value={q.type}

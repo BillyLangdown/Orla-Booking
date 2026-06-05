@@ -1,16 +1,26 @@
 'use client'
 
-import type { Booking, Tenant } from '@/types'
+import type { AvailabilitySlot, Booking, Tenant } from '@/types'
 import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
 
 interface Props {
   booking: Booking
   tenant: Pick<Tenant, 'name' | 'address'>
+  slot?: Pick<AvailabilitySlot, 'date' | 'startTime' | 'endTime'>
   onBookAnother: () => void
 }
 
-export default function BookingSuccess({ booking, tenant, onBookAnother }: Props) {
+export default function BookingSuccess({ booking, tenant, slot, onBookAnother }: Props) {
+  const resolvedSlot = slot ?? booking.slot
+  const formattedDate = resolvedSlot
+    ? new Date(`${resolvedSlot.date}T00:00:00`).toLocaleDateString('en-GB', {
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+      })
+    : null
+  const formattedTime = resolvedSlot
+    ? `${resolvedSlot.startTime} – ${resolvedSlot.endTime}`
+    : null
   const isPending = booking.status === 'pending'
 
   const calUrl = booking.startTimeIso && booking.endTimeIso
@@ -25,32 +35,60 @@ export default function BookingSuccess({ booking, tenant, onBookAnother }: Props
 
   return (
     <div className="flex flex-col items-center text-center gap-6 py-8">
-      <div className="flex h-14 w-14 items-center justify-center bg-emerald-100">
-        <svg
-          className="h-7 w-7 text-emerald-600"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-          aria-hidden="true"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-        </svg>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <h2 className="text-xl font-semibold text-ink">
-          {isPending ? 'Request sent!' : 'Booking confirmed!'}
-        </h2>
-        <p className="text-sm text-secondary max-w-xs">
-          {isPending
-            ? <>Your request has been sent to <strong>{tenant.name}</strong>. You&apos;ll receive a confirmation email once it&apos;s approved.</>
-            : <>A confirmation email with a calendar invite has been sent to <strong>{booking.email}</strong>.</>
-          }
-        </p>
+      <div className="flex flex-col items-center gap-2 md:flex-row md:items-center md:gap-4 md:text-left">
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center bg-emerald-100">
+          <svg
+            className="h-7 w-7 text-emerald-600"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+            aria-hidden="true"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <div className="flex flex-col gap-2">
+          <h2 className="text-xl font-semibold text-ink">
+            {isPending ? 'Request sent!' : 'Booking confirmed!'}
+          </h2>
+          <p className="text-sm text-secondary max-w-xs">
+            {isPending
+              ? <>Your request has been sent to <strong>{tenant.name}</strong>. You&apos;ll receive a confirmation email once it&apos;s approved.</>
+              : <>A confirmation email with a calendar invite has been sent to <strong>{booking.email}</strong>.</>
+            }
+          </p>
+        </div>
       </div>
 
       <div className="w-full bg-white shadow-sm p-4 text-left flex flex-col gap-2">
+        {formattedDate && (
+          <div className="flex items-start justify-between gap-4">
+            <span className="text-xs text-secondary shrink-0">Date</span>
+            <span className="text-sm text-ink text-right">{formattedDate}</span>
+          </div>
+        )}
+        {formattedTime && (
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-secondary">Time</span>
+            <span className="text-sm text-ink">{formattedTime}</span>
+          </div>
+        )}
+        {tenant.address && (
+          <div className="flex items-start justify-between gap-4">
+            <span className="text-xs text-secondary shrink-0">Location</span>
+            <span className="text-sm text-ink text-right">{tenant.address}</span>
+          </div>
+        )}
+        {booking.resourceName && (
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-secondary">With</span>
+            <span className="text-sm text-ink">{booking.resourceName}</span>
+          </div>
+        )}
+        {(formattedDate || formattedTime || tenant.address || booking.resourceName) && (
+          <div className="border-t border-border my-1" />
+        )}
         <div className="flex items-center justify-between">
           <span className="text-xs text-secondary">Booking ref</span>
           <span className="text-xs font-mono text-ink">{booking.id}</span>

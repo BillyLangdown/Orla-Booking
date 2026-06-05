@@ -40,7 +40,7 @@ export async function createBusinessAction(
 
   if (tenantError) return { error: tenantError.message }
 
-  // 2. Invite admin — sends email with link that lands on /setup to set password
+  // 2. Invite admin - sends email with link that lands on /setup to set password
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ??
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
   const { data: authData, error: authError } = await adminSupabase.auth.admin.inviteUserByEmail(

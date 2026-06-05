@@ -22,7 +22,7 @@ export const createClient = async (request: NextRequest) => {
     },
   })
 
-  // Refresh session — must call getUser() for the cookie refresh to work
+  // Refresh session - must call getUser() for the cookie refresh to work
   await supabase.auth.getUser()
 
   return supabaseResponse

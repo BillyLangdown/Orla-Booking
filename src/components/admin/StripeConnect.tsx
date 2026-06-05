@@ -1,0 +1,58 @@
+'use client'
+
+import { useState } from 'react'
+import type { Tenant } from '@/types'
+import Button from '@/components/ui/Button'
+
+interface Props { tenant: Tenant }
+
+export default function StripeConnect({ tenant }: Props) {
+  const [loading, setLoading] = useState(false)
+  const [error, setError]     = useState<string | null>(null)
+
+  async function handleConnect() {
+    setLoading(true)
+    setError(null)
+    const res  = await fetch('/api/stripe/connect', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ tenantId: tenant.id }),
+    })
+    const json = await res.json()
+    if (json.url) {
+      window.location.href = json.url
+    } else {
+      setError(json.error ?? 'Something went wrong')
+      setLoading(false)
+    }
+  }
+
+  if (tenant.stripeOnboarded) {
+    return (
+      <div className="bg-white shadow-sm p-4 sm:p-5 flex items-center justify-between gap-4">
+        <div className="flex flex-col gap-0.5">
+          <p className="text-sm font-medium text-ink">Stripe account</p>
+          <p className="font-mono text-xs text-muted">{tenant.stripeAccountId}</p>
+        </div>
+        <span className="shrink-0 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2.5 py-1">
+          Connected
+        </span>
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-white shadow-sm p-4 sm:p-5 flex flex-col gap-4">
+      <div>
+        <p className="text-sm font-semibold text-ink">Connect your Stripe account</p>
+        <p className="text-xs text-secondary mt-1 leading-relaxed">
+          Accept card payments directly into your bank. Stripe guides you through the whole setup - no technical knowledge needed. Takes about 5 minutes.
+        </p>
+      </div>
+      {error && <p className="text-xs text-rose-600 bg-rose-50 border border-rose-100 px-3 py-2">{error}</p>}
+      <Button type="button" onClick={handleConnect} loading={loading} className="self-start">
+        Connect Stripe →
+      </Button>
+    </div>
+  )
+}

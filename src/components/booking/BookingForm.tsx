@@ -92,8 +92,9 @@ export default function BookingForm({ slot, tenantId, intakeQuestions, onBack, o
   const [phone, setPhone] = useState('')
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [errors, setErrors]   = useState<Record<string, string>>({})
-  const [serverError, setServerError] = useState<string | null>(null)
-  const [submitting, setSubmitting]   = useState(false)
+  const [serverError, setServerError]   = useState<string | null>(null)
+  const [submitting, setSubmitting]     = useState(false)
+  const [redirecting, setRedirecting]   = useState(false)
 
   function setAnswer(id: string, value: string) {
     setAnswers((prev) => ({ ...prev, [id]: value }))
@@ -137,6 +138,9 @@ export default function BookingForm({ slot, tenantId, intakeQuestions, onBack, o
     if (result.error) {
       setServerError(result.error)
       setSubmitting(false)
+    } else if (result.checkoutUrl) {
+      setRedirecting(true)
+      window.location.href = result.checkoutUrl
     } else if (result.booking) {
       onSuccess(result.booking)
     }
@@ -213,8 +217,8 @@ export default function BookingForm({ slot, tenantId, intakeQuestions, onBack, o
             {serverError}
           </p>
         )}
-        <Button type="submit" loading={submitting} size="lg" className="w-full">
-          Confirm booking
+        <Button type="submit" loading={submitting || redirecting} size="lg" className="w-full">
+          {redirecting ? 'Redirecting to payment…' : 'Confirm booking'}
         </Button>
         <p className="text-xs text-secondary text-center">
           You&apos;ll receive a confirmation email once your booking is placed.

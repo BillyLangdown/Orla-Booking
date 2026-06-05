@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   const next       = searchParams.get('next') ?? '/setup'
 
   // Collect cookies set during auth so we can attach them to the redirect response.
-  // Using NextResponse.redirect() creates a new response object — cookies written to
+  // Using NextResponse.redirect() creates a new response object - cookies written to
   // the request cookie store don't carry over, so we must set them explicitly here.
   const cookiesToForward: { name: string; value: string; options: CookieOptions }[] = []
 

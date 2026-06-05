@@ -170,7 +170,7 @@ export default function BookingCalendar({ slots, onSelect }: Props) {
         </div>
       )}
 
-      {/* Empty state — no slots this month */}
+      {/* Empty state - no slots this month */}
       {availableDates.size === 0 && !selected && (
         <p className="text-sm text-secondary text-center py-2">
           No sessions available this month. Try the next month.

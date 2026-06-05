@@ -16,7 +16,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <Sidebar tenantName={tenant.name} tenantSlug={tenant.slug} />
       </div>
 
-      {/* Mobile fixed header + nav — pinned to viewport, outside content flow */}
+      {/* Mobile fixed header + nav - pinned to viewport, outside content flow */}
       <div
         className="fixed top-0 inset-x-0 z-50 flex flex-col md:hidden"
         style={{ background: 'linear-gradient(180deg, #0D1117 0%, #1a2644 100%)' }}

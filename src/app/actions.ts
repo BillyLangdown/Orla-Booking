@@ -7,14 +7,29 @@ import { availabilityService } from '@/services/availabilityService'
 import { tenantService } from '@/services/tenantService'
 import { resourceService } from '@/services/resourceService'
 import { adminSupabase } from '@/lib/supabase/admin'
-import { sendBookingConfirmation, sendAdminNotification } from '@/lib/email'
-import type { Booking, CreateBookingInput, CreateSlotInput, IntakeQuestion, UpdateTenantInput } from '@/types'
+import { sendBookingConfirmation, sendAdminNotification, sendPaymentLink } from '@/lib/email'
+import { stripe, createCheckoutSession } from '@/lib/stripe'
+import type { Booking, CreateBookingInput, CreateSlotInput, IntakeQuestion, PaymentMode, SessionTypePrices, UpdateTenantInput } from '@/types'
+
+function getPaymentAmount(
+  paymentMode: PaymentMode,
+  sessionType: string,
+  prices: SessionTypePrices,
+): number {
+  if (paymentMode === 'none') return 0
+  const config = prices[sessionType]
+  if (!config) return 0
+  return paymentMode === 'deposit' ? (config.depositAmount ?? 0) : (config.price ?? 0)
+}
+
+const appUrl = process.env.NEXT_PUBLIC_APP_URL
+  ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
 
 async function resolveBookingTimes(booking: Booking): Promise<{ startTime: string; endTime: string } | null> {
   if (booking.startTimeIso && booking.endTimeIso) {
     return { startTime: booking.startTimeIso, endTime: booking.endTimeIso }
   }
-  // Times missing on booking row — fetch directly from the slot
+  // Times missing on booking row - fetch directly from the slot
   const { data: slot } = await adminSupabase
     .from('availability_slots')
     .select('start_time, end_time')
@@ -28,17 +43,41 @@ async function resolveBookingTimes(booking: Booking): Promise<{ startTime: strin
 
 export async function createBookingAction(
   input: CreateBookingInput,
-): Promise<{ booking?: Booking; error?: string }> {
+): Promise<{ booking?: Booking; checkoutUrl?: string; error?: string }> {
   try {
     const tenant = await tenantService.getTenantById(input.tenantId)
     const autoConfirm = tenant?.autoConfirm === true
-    const booking = await bookingService.createBooking({ ...input, status: autoConfirm ? 'confirmed' : 'pending' })
+
+    const amount = tenant
+      ? getPaymentAmount(tenant.paymentMode, input.sessionType, tenant.sessionTypePrices)
+      : 0
+    const needsPayment = amount > 0 && !!tenant?.stripeOnboarded && !!tenant?.stripeAccountId
+
+    // When payment is required booking stays pending until Stripe webhook confirms it
+    const status = autoConfirm && !needsPayment ? 'confirmed' : 'pending'
+    const booking = await bookingService.createBooking({ ...input, status })
 
     if (tenant) {
       await sendAdminNotification(booking, input.startTime, input.endTime, tenant)
-      if (autoConfirm) {
-        await sendBookingConfirmation(booking, input.startTime, input.endTime, tenant)
-      }
+    }
+
+    if (needsPayment && tenant) {
+      const checkoutUrl = await createCheckoutSession({
+        bookingId:        booking.id,
+        tenantId:         booking.tenantId,
+        stripeAccountId:  tenant.stripeAccountId!,
+        amountInSmallest: amount,
+        currency:         tenant.currency,
+        label:            booking.sessionType ? `${booking.sessionType} - ${tenant.name}` : tenant.name,
+        customerEmail:    booking.email,
+        cancelUrl:        `${appUrl}/book/${tenant.slug}`,
+        appUrl,
+      })
+      return { checkoutUrl }
+    }
+
+    if (tenant && autoConfirm) {
+      await sendBookingConfirmation(booking, input.startTime, input.endTime, tenant)
     }
 
     return { booking }
@@ -59,18 +98,45 @@ export async function cancelBookingAction(bookingId: string): Promise<{ error?: 
 
 export async function confirmBookingAction(bookingId: string): Promise<{ error?: string }> {
   try {
-    const booking = await bookingService.confirmBooking(bookingId)
-    try {
-      const [tenant, times] = await Promise.all([
-        tenantService.getTenantById(booking.tenantId),
-        resolveBookingTimes(booking),
-      ])
-      if (tenant && times) {
-        await sendBookingConfirmation(booking, times.startTime, times.endTime, tenant)
+    const pendingBooking = await bookingService.getBookingById(bookingId)
+    if (!pendingBooking) throw new Error('Booking not found')
+
+    const tenant = await tenantService.getTenantById(pendingBooking.tenantId)
+    const amount = tenant
+      ? getPaymentAmount(tenant.paymentMode, pendingBooking.sessionType, tenant.sessionTypePrices)
+      : 0
+    const needsPayment = amount > 0 && !!tenant?.stripeOnboarded && !!tenant?.stripeAccountId
+
+    if (needsPayment && tenant) {
+      // Don't mark confirmed yet - send payment link, webhook confirms after payment
+      const checkoutUrl = await createCheckoutSession({
+        bookingId:        bookingId,
+        tenantId:         pendingBooking.tenantId,
+        stripeAccountId:  tenant.stripeAccountId!,
+        amountInSmallest: amount,
+        currency:         tenant.currency,
+        label:            pendingBooking.sessionType ? `${pendingBooking.sessionType} - ${tenant.name}` : tenant.name,
+        customerEmail:    pendingBooking.email,
+        cancelUrl:        `${appUrl}/book/${tenant.slug}`,
+        appUrl,
+      })
+      await adminSupabase
+        .from('bookings')
+        .update({ status: 'awaiting_payment' })
+        .eq('id', bookingId)
+      await sendPaymentLink(pendingBooking, checkoutUrl, amount, tenant.currency, tenant)
+    } else {
+      const booking = await bookingService.confirmBooking(bookingId)
+      try {
+        const times = await resolveBookingTimes(booking)
+        if (tenant && times) {
+          await sendBookingConfirmation(booking, times.startTime, times.endTime, tenant)
+        }
+      } catch {
+        // email failures are non-fatal
       }
-    } catch {
-      // email failures are non-fatal to the confirm action
     }
+
     revalidatePath('/dashboard/bookings')
     return {}
   } catch (err) {
@@ -147,6 +213,19 @@ export async function saveIntakeQuestionsAction(
 
 export async function completeOnboardingAction(tenantId: string): Promise<void> {
   await tenantService.completeOnboarding(tenantId)
+}
+
+export async function savePaymentSettingsAction(
+  tenantId: string,
+  opts: { paymentMode: PaymentMode; sessionTypePrices: SessionTypePrices; showPricesOnBookingPage: boolean },
+): Promise<{ error?: string }> {
+  try {
+    await tenantService.savePaymentSettings(tenantId, opts)
+    revalidatePath('/dashboard/settings')
+    return {}
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : 'Failed to save payment settings' }
+  }
 }
 
 export async function setPasswordAction(password: string): Promise<{ error?: string }> {

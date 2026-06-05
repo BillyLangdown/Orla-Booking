@@ -129,7 +129,7 @@ export default function BookingDrawer({ booking, onClose }: Props) {
               {hasAnswers && (
                 <Section title="Booking questions">
                   {Object.entries(booking.intakeAnswers).map(([question, answer]) => (
-                    <Field key={question} label={question}>{answer || '—'}</Field>
+                    <Field key={question} label={question}>{answer || '-'}</Field>
                   ))}
                 </Section>
               )}

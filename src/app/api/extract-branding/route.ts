@@ -22,7 +22,7 @@ function normaliseHex(raw: string): string | null {
 function extractColors(html: string): string[] {
   const found: string[] = []
 
-  // 1. Meta theme-color — most reliable signal
+  // 1. Meta theme-color - most reliable signal
   const themeColor = html.match(/name=["']theme-color["'][^>]+content=["']([^"']+)/i)?.[1]
     ?? html.match(/content=["']([^"']+)["'][^>]*name=["']theme-color["']/i)?.[1]
   if (themeColor) {

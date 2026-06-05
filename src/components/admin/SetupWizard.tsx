@@ -228,7 +228,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
       {/* Content */}
       <div className="flex-1 mx-auto w-full max-w-xl px-4 py-8 flex flex-col gap-6">
 
-        {/* Step 0 — Password */}
+        {/* Step 0 - Password */}
         {step === 0 && (
           <>
             <div>
@@ -280,7 +280,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
           </>
         )}
 
-        {/* Step 1 — Business */}
+        {/* Step 1 - Business */}
         {step === 1 && (
           <>
             <div>
@@ -319,7 +319,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
           </>
         )}
 
-        {/* Step 2 — Services */}
+        {/* Step 2 - Services */}
         {step === 2 && (
           <>
             <div>
@@ -335,12 +335,12 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
           </>
         )}
 
-        {/* Step 3 — Branding */}
+        {/* Step 3 - Branding */}
         {step === 3 && (
           <>
             <div>
               <h1 className="text-2xl font-bold text-ink">Add your logo</h1>
-              <p className="text-sm text-secondary mt-1">Optional — shown at the top of your booking page.</p>
+              <p className="text-sm text-secondary mt-1">Optional - shown at the top of your booking page.</p>
             </div>
             <div className="bg-white shadow-sm p-5">
               <LogoUpload currentUrl={logoUrl || undefined} onUpload={setLogoUrl} />
@@ -349,7 +349,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
           </>
         )}
 
-        {/* Step 4 — Availability */}
+        {/* Step 4 - Availability */}
         {step === 4 && (
           <>
             <div>
@@ -362,7 +362,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
               <div>
                 <p className="text-sm font-semibold text-ink mb-0.5">What are customers booking?</p>
                 <p className="text-xs text-secondary leading-relaxed">
-                  Add the people or things customers will be booking — for example a staff member, a vehicle, a room, or a piece of equipment.
+                  Add the people or things customers will be booking - for example a staff member, a vehicle, a room, or a piece of equipment.
                   Each time slot is linked to one of these, so you always know who or what is booked.
                 </p>
               </div>
@@ -482,7 +482,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
           </>
         )}
 
-        {/* Step 5 — Questions */}
+        {/* Step 5 - Questions */}
         {step === 5 && (
           <>
             <div>
@@ -528,7 +528,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
           </>
         )}
 
-        {/* Step 6 — Done */}
+        {/* Step 6 - Done */}
         {step === 6 && (
           <div className="flex flex-col items-center text-center gap-6 py-8">
             <div className="flex h-14 w-14 items-center justify-center bg-emerald-100">

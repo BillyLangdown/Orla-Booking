@@ -1,4 +1,4 @@
-// RFC 5545 iCalendar utilities — no external dependencies
+// RFC 5545 iCalendar utilities - no external dependencies
 
 function foldLine(line: string): string {
   if (line.length <= 75) return line

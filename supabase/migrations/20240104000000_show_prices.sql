@@ -1,0 +1,2 @@
+ALTER TABLE tenants
+  ADD COLUMN IF NOT EXISTS show_prices_on_booking_page BOOLEAN NOT NULL DEFAULT FALSE;

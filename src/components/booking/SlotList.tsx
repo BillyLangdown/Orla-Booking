@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 import type { AvailabilitySlot } from '@/types'
-import SlotCard from '@/components/booking/SlotCard'
+import SlotCard, { type SlotPricing } from '@/components/booking/SlotCard'
 
 interface Props {
-  slots: AvailabilitySlot[]
+  slots:    AvailabilitySlot[]
+  pricing?: SlotPricing
   onSelect: (slot: AvailabilitySlot) => void
 }
 
@@ -14,7 +15,7 @@ function formatDateHeading(isoDate: string): string {
   return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
 }
 
-export default function SlotList({ slots, onSelect }: Props) {
+export default function SlotList({ slots, pricing, onSelect }: Props) {
   const [filter, setFilter] = useState<string>('All')
 
   const presentTypes = [...new Set(slots.map((s) => s.sessionType).filter(Boolean))].sort()
@@ -63,7 +64,7 @@ export default function SlotList({ slots, onSelect }: Props) {
               </h3>
               <div className="flex flex-col gap-2">
                 {dateSlots.map((slot) => (
-                  <SlotCard key={slot.id} slot={slot} onSelect={onSelect} />
+                  <SlotCard key={slot.id} slot={slot} pricing={pricing} onSelect={onSelect} />
                 ))}
               </div>
             </div>

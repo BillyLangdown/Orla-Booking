@@ -4,15 +4,17 @@ import { useState } from 'react'
 import type { AvailabilitySlot } from '@/types'
 import SlotList from './SlotList'
 import BookingCalendar from './BookingCalendar'
+import type { SlotPricing } from './SlotCard'
 
 type View = 'list' | 'calendar'
 
 interface Props {
-  slots: AvailabilitySlot[]
+  slots:    AvailabilitySlot[]
+  pricing?: SlotPricing
   onSelect: (slot: AvailabilitySlot) => void
 }
 
-export default function SlotView({ slots, onSelect }: Props) {
+export default function SlotView({ slots, pricing, onSelect }: Props) {
   const [view, setView] = useState<View>('list')
 
   return (
@@ -44,7 +46,7 @@ export default function SlotView({ slots, onSelect }: Props) {
       </div>
 
       {view === 'list' ? (
-        <SlotList slots={slots} onSelect={onSelect} />
+        <SlotList slots={slots} pricing={pricing} onSelect={onSelect} />
       ) : (
         <BookingCalendar slots={slots} onSelect={onSelect} />
       )}

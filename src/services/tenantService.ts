@@ -1,5 +1,5 @@
 import { adminSupabase as supabase } from '@/lib/supabase/admin'
-import type { IntakeQuestion, Tenant, UpdateTenantInput } from '@/types'
+import type { IntakeQuestion, PaymentMode, SessionTypePrices, Tenant, UpdateTenantInput } from '@/types'
 
 function mapTenant(row: Record<string, unknown>): Tenant {
   const b = (row.branding ?? {}) as Record<string, string>
@@ -21,6 +21,12 @@ function mapTenant(row: Record<string, unknown>): Tenant {
       primaryColor: b.primary_color ?? b.primaryColor ?? '#1e293b',
       accentColor:  b.accent_color  ?? b.accentColor  ?? '#f97316',
     },
+    stripeAccountId:         (row.stripe_account_id           as string)       ?? undefined,
+    stripeOnboarded:         (row.stripe_onboarded            as boolean)      ?? false,
+    paymentMode:             ((row.payment_mode               as PaymentMode)  ?? 'none'),
+    sessionTypePrices:       (row.session_type_prices         as SessionTypePrices) ?? {},
+    currency:                (row.currency                    as string)       ?? 'gbp',
+    showPricesOnBookingPage: (row.show_prices_on_booking_page as boolean)      ?? false,
   }
 }
 
@@ -55,6 +61,22 @@ export const tenantService = {
     const { error } = await supabase
       .from('tenants')
       .update({ intake_questions: questions })
+      .eq('id', id)
+    if (error) throw new Error(error.message)
+  },
+
+  async savePaymentSettings(id: string, opts: {
+    paymentMode: PaymentMode
+    sessionTypePrices: SessionTypePrices
+    showPricesOnBookingPage: boolean
+  }): Promise<void> {
+    const { error } = await supabase
+      .from('tenants')
+      .update({
+        payment_mode:                 opts.paymentMode,
+        session_type_prices:          opts.sessionTypePrices,
+        show_prices_on_booking_page:  opts.showPricesOnBookingPage,
+      })
       .eq('id', id)
     if (error) throw new Error(error.message)
   },

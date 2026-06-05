@@ -49,7 +49,7 @@ export async function GET(
     startIso,
     endIso,
     organizerName:  tenant?.name  ?? 'Booking',
-    organizerEmail: tenant?.email ?? 'noreply@example.com',
+    organizerEmail: tenant?.email ?? 'noreply@slickbooking.com',
   })
 
   return new NextResponse(icsContent, {

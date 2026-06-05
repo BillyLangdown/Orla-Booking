@@ -8,16 +8,24 @@ import { Input } from '@/components/ui/Input'
 import LogoUpload from './LogoUpload'
 import IntakeBuilder from './IntakeBuilder'
 import SessionTypeEditor from './SessionTypeEditor'
+import PaymentSettings from './PaymentSettings'
 
 interface Props { tenant: Tenant; slotSessionTypes?: string[]; resources?: Resource[] }
 
-const TABS = ['Business', 'Bookings', 'Services', 'Resources', 'Branding', 'Questions'] as const
+const TABS = ['Business', 'Bookings', 'Services', 'Resources', 'Branding', 'Questions', 'Payments'] as const
 type Tab = typeof TABS[number]
 
 const inputClass = 'w-full bg-white border border-border px-3 py-3 text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-ink/20 transition'
 
 export default function SettingsForm({ tenant, slotSessionTypes = [], resources: initialResources = [] }: Props) {
-  const [tab, setTab] = useState<Tab>('Business')
+  const initialTab = (): Tab => {
+    if (typeof window !== 'undefined') {
+      const p = new URLSearchParams(window.location.search).get('tab')
+      if (p && (TABS as readonly string[]).includes(p)) return p as Tab
+    }
+    return 'Business'
+  }
+  const [tab, setTab] = useState<Tab>(initialTab)
 
   const [name, setName]               = useState(tenant.name)
   const [email, setEmail]             = useState(tenant.email)
@@ -110,7 +118,7 @@ export default function SettingsForm({ tenant, slotSessionTypes = [], resources:
   return (
     <div className="flex flex-col gap-5">
 
-      {/* Tab nav — scrollable on mobile */}
+      {/* Tab nav - scrollable on mobile */}
       <div className="relative border-b border-border">
         <div ref={tabsRef} className="overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <div className="flex min-w-max">
@@ -225,7 +233,7 @@ export default function SettingsForm({ tenant, slotSessionTypes = [], resources:
       {tab === 'Resources' && (
         <div className="flex flex-col gap-4">
           <p className="text-xs text-secondary">
-            Add the people, places, and equipment that customers can be assigned to when booking. All are optional — only add what's relevant to your business.
+            Add the people, places, and equipment that customers can be assigned to when booking. All are optional - only add what's relevant to your business.
           </p>
 
           {resError && <p className="text-xs text-rose-600 bg-rose-50 border border-rose-100 px-3 py-2">{resError}</p>}
@@ -311,6 +319,11 @@ export default function SettingsForm({ tenant, slotSessionTypes = [], resources:
             {savedQ && <span className="text-sm text-green-600 font-medium">Saved ✓</span>}
           </div>
         </div>
+      )}
+
+      {/* ── Payments ── */}
+      {tab === 'Payments' && (
+        <PaymentSettings tenant={tenant} sessionTypes={sessionTypes} />
       )}
 
     </div>

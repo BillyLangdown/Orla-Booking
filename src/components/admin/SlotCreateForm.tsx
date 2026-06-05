@@ -171,7 +171,7 @@ export default function SlotCreateForm({ tenantId, resources, sessionTypes = [],
             {/* Body */}
             <div className="overflow-y-auto flex-1 px-5 py-5 flex flex-col gap-4">
 
-              {/* Resource — optional, grouped by type */}
+              {/* Resource - optional, grouped by type */}
               {resources.length > 0 && (
                 <div className="flex flex-col gap-1.5">
                   <label className={lbl}>Assign to <span className="normal-case font-normal text-muted">(optional)</span></label>

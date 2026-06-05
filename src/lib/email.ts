@@ -8,8 +8,8 @@ const resend = process.env.RESEND_API_KEY
 
 const FROM = process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev'
 
-if (!process.env.RESEND_API_KEY) console.warn('[email] RESEND_API_KEY is not set — emails will not send')
-if (!process.env.RESEND_FROM_EMAIL) console.warn('[email] RESEND_FROM_EMAIL is not set — falling back to onboarding@resend.dev (test only)')
+if (!process.env.RESEND_API_KEY) console.warn('[email] RESEND_API_KEY is not set - emails will not send')
+if (!process.env.RESEND_FROM_EMAIL) console.warn('[email] RESEND_FROM_EMAIL is not set - falling back to onboarding@resend.dev (test only)')
 
 function formatISODate(iso: string) {
   const d = new Date(iso)
@@ -26,7 +26,7 @@ export async function sendBookingConfirmation(
   tenant: Tenant,
 ): Promise<void> {
   try {
-    if (!resend) { console.warn('[email] sendBookingConfirmation skipped — no Resend client'); return }
+    if (!resend) { console.warn('[email] sendBookingConfirmation skipped - no Resend client'); return }
 
   const start = formatISODate(startTime)
   const end   = formatISODate(endTime)
@@ -121,7 +121,7 @@ export async function sendBookingConfirmation(
 </body>
 </html>`
 
-  const text = `Booking confirmed — ${booking.sessionType} with ${tenant.name}
+  const text = `Booking confirmed - ${booking.sessionType} with ${tenant.name}
 
 Hi ${booking.name},
 
@@ -135,7 +135,7 @@ ${contactLines ? `Contact the business:\n${contactLines}` : ''}`
     const { data, error } = await resend.emails.send({
       from: FROM,
       to: booking.email,
-      subject: `Booking confirmed — ${booking.sessionType} with ${tenant.name}`,
+      subject: `Booking confirmed - ${booking.sessionType} with ${tenant.name}`,
       html,
       text,
     })
@@ -153,8 +153,8 @@ export async function sendAdminNotification(
   tenant: Tenant,
 ): Promise<void> {
   try {
-    if (!resend) { console.warn('[email] sendAdminNotification skipped — no Resend client'); return }
-    if (!tenant.email) { console.warn('[email] sendAdminNotification skipped — tenant has no email address'); return }
+    if (!resend) { console.warn('[email] sendAdminNotification skipped - no Resend client'); return }
+    if (!tenant.email) { console.warn('[email] sendAdminNotification skipped - tenant has no email address'); return }
 
     const start = formatISODate(startTime)
     const end   = formatISODate(endTime)
@@ -205,7 +205,7 @@ export async function sendAdminNotification(
       <p style="margin:4px 0 0;font-size:14px;color:rgba(255,255,255,0.8);">${isPending ? 'New booking request' : 'New booking received'}</p>
     </div>
     <div style="padding:28px;">
-      <h1 style="margin:0 0 8px;font-size:20px;font-weight:600;">${isPending ? 'Booking request — ' : 'New booking — '}${booking.sessionType}</h1>
+      <h1 style="margin:0 0 8px;font-size:20px;font-weight:600;">${isPending ? 'Booking request - ' : 'New booking - '}${booking.sessionType}</h1>
       <p style="margin:0 0 24px;color:#64748b;font-size:15px;">${isPending ? 'A customer is requesting a session. Confirm or deny below.' : 'A customer has just booked a session.'}</p>
 
       <table style="width:100%;border-collapse:collapse;font-size:14px;">
@@ -257,7 +257,7 @@ export async function sendAdminNotification(
 </body>
 </html>`
 
-    const text = `${isPending ? 'Booking request' : 'New booking'} — ${booking.sessionType}
+    const text = `${isPending ? 'Booking request' : 'New booking'} - ${booking.sessionType}
 
 Customer: ${booking.name}
 Email: ${booking.email}
@@ -273,8 +273,8 @@ ${isPending ? `\nConfirm: ${appUrl}/api/booking/${booking.id}/confirm\nDeny: ${a
       from: FROM,
       to: tenant.email,
       subject: isPending
-        ? `Booking request — ${booking.name}${booking.sessionType ? ` (${booking.sessionType})` : ''}`
-        : `New booking — ${booking.name}${booking.sessionType ? ` (${booking.sessionType})` : ''}`,
+        ? `Booking request - ${booking.name}${booking.sessionType ? ` (${booking.sessionType})` : ''}`
+        : `New booking - ${booking.name}${booking.sessionType ? ` (${booking.sessionType})` : ''}`,
       html,
       text,
     })
@@ -282,6 +282,84 @@ ${isPending ? `\nConfirm: ${appUrl}/api/booking/${booking.id}/confirm\nDeny: ${a
     else console.log('[email] Admin notification sent:', data?.id, '→', tenant.email)
   } catch (err) {
     console.error('[email] Failed to send admin notification:', err)
+  }
+}
+
+export async function sendPaymentLink(
+  booking: Booking,
+  paymentUrl: string,
+  amountInSmallest: number,
+  currency: string,
+  tenant: Tenant,
+): Promise<void> {
+  try {
+    if (!resend) { console.warn('[email] sendPaymentLink skipped - no Resend client'); return }
+
+    const accentColor = tenant.branding?.accentColor ?? '#0f172a'
+    const symbol = currency === 'usd' ? '$' : currency === 'eur' ? '€' : '£'
+    const amountStr = `${symbol}${(amountInSmallest / 100).toFixed(2)}`
+
+    const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family:sans-serif;color:#0f172a;background:#f8fafc;margin:0;padding:32px 16px;">
+  <div style="max-width:520px;margin:0 auto;background:#ffffff;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;">
+    <div style="background:${accentColor};padding:24px 28px;">
+      <p style="margin:0;font-size:22px;font-weight:700;color:#ffffff;">${tenant.name}</p>
+    </div>
+    <div style="padding:28px;">
+      <h1 style="margin:0 0 8px;font-size:20px;font-weight:600;">Complete your booking</h1>
+      <p style="margin:0 0 24px;color:#64748b;font-size:15px;">Hi ${booking.name}, your booking has been approved. Pay <strong>${amountStr}</strong> to confirm your slot.</p>
+
+      <a href="${paymentUrl}" target="_blank"
+        style="display:block;padding:15px 20px;background:#0f172a;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;text-align:center;border-radius:8px;margin-bottom:8px;">
+        Pay ${amountStr} to confirm
+      </a>
+      <p style="margin:8px 0 0;font-size:12px;color:#94a3b8;text-align:center;">Secure payment powered by Stripe</p>
+
+      <table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:28px;">
+        <tr style="border-bottom:1px solid #e2e8f0;">
+          <td style="padding:10px 0;color:#64748b;width:40%;">Session type</td>
+          <td style="padding:10px 0;font-weight:500;">${booking.sessionType}</td>
+        </tr>
+        <tr style="border-bottom:1px solid #e2e8f0;">
+          <td style="padding:10px 0;color:#64748b;">Amount</td>
+          <td style="padding:10px 0;font-weight:500;">${amountStr}</td>
+        </tr>
+        <tr style="border-bottom:1px solid #e2e8f0;">
+          <td style="padding:10px 0;color:#64748b;">Booking ref</td>
+          <td style="padding:10px 0;font-family:monospace;font-size:12px;">${booking.id}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</body>
+</html>`
+
+    const text = `Complete your booking - ${booking.sessionType} with ${tenant.name}
+
+Hi ${booking.name},
+
+Your booking has been approved. Please pay ${amountStr} to confirm your slot.
+
+Pay here: ${paymentUrl}
+
+Session type: ${booking.sessionType}
+Amount: ${amountStr}
+Booking ref: ${booking.id}`
+
+    const { data, error } = await resend.emails.send({
+      from: FROM,
+      to:   booking.email,
+      subject: `Complete your booking - ${booking.sessionType} with ${tenant.name}`,
+      html,
+      text,
+    })
+    if (error) console.error('[email] Payment link send failed:', error)
+    else console.log('[email] Payment link sent:', data?.id, '→', booking.email)
+  } catch (err) {
+    console.error('[email] Failed to send payment link:', err)
   }
 }
 
@@ -343,7 +421,7 @@ export async function sendBookingDeclined(
 </body>
 </html>`
 
-    const text = `Booking not accepted — ${booking.sessionType} with ${tenant.name}
+    const text = `Booking not accepted - ${booking.sessionType} with ${tenant.name}
 
 Hi ${booking.name},
 
@@ -359,7 +437,7 @@ ${contactLines ? `\nContact us:\n${contactLines}` : ''}`
     const { data, error } = await resend.emails.send({
       from: FROM,
       to: booking.email,
-      subject: `Booking update — ${booking.sessionType} with ${tenant.name}`,
+      subject: `Booking update - ${booking.sessionType} with ${tenant.name}`,
       html,
       text,
     })

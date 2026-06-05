@@ -2,7 +2,7 @@ import { adminSupabase as supabase } from '@/lib/supabase/admin'
 import type { Booking, BookingStatus, CreateBookingInput } from '@/types'
 
 function isoToDate(iso: string): string {
-  // Returns YYYY-MM-DD — safe: a 1-hour UTC offset never crosses midnight for typical slots
+  // Returns YYYY-MM-DD - safe: a 1-hour UTC offset never crosses midnight for typical slots
   return iso.slice(0, 10)
 }
 
@@ -36,6 +36,8 @@ function mapBooking(row: Record<string, unknown>): Booking {
     status:      (row.status as BookingStatus) ?? 'confirmed',
     startTimeIso: startIso ?? undefined,
     endTimeIso:   endIso   ?? undefined,
+    stripePaymentIntentId: (row.stripe_payment_intent_id as string) ?? undefined,
+    amountPaid:            (row.amount_paid as number) ?? undefined,
   }
 }
 
@@ -88,8 +90,8 @@ export const bookingService = {
       .rpc('claim_slot', { p_slot_id: input.slotId })
     if (claimError) {
       if (claimError.message.includes('Could not find the function')) {
-        // claim_slot migration not yet applied — non-atomic fallback
-        console.warn('[booking] claim_slot not found — run supabase/migrations/20240101000000_claim_slot.sql')
+        // claim_slot migration not yet applied - non-atomic fallback
+        console.warn('[booking] claim_slot not found - run supabase/migrations/20240101000000_claim_slot.sql')
         const { data: slot } = await supabase
           .from('availability_slots')
           .select('booked, capacity')

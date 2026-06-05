@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const tenant = await tenantService.getTenantBySlug(slug)
   if (!tenant) return {}
   return {
-    title: `Book — ${tenant.name}`,
+    title: `Book - ${tenant.name}`,
     description: tenant.description,
   }
 }

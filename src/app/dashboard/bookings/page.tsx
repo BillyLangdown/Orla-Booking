@@ -11,7 +11,7 @@ export default async function BookingsPage() {
       <div>
         <h1 className="text-xl font-semibold text-ink">Bookings</h1>
         <p className="text-sm text-secondary mt-0.5">
-          {bookings.length > 0 ? `${bookings.length} booking${bookings.length !== 1 ? 's' : ''} total` : 'No bookings yet — share your booking link to get started.'}
+          {bookings.length > 0 ? `${bookings.length} booking${bookings.length !== 1 ? 's' : ''} total` : 'No bookings yet - share your booking link to get started.'}
         </p>
       </div>
       <BookingsView bookings={bookings} />

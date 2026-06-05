@@ -91,15 +91,15 @@ export default function BusinessDetailClient({ tenant, resources }: Props) {
           <div className="bg-white shadow-sm divide-y divide-border/50">
             <div className="px-5 py-3 flex justify-between text-sm">
               <span className="text-secondary">Email</span>
-              <span className="text-ink">{tenant.email || '—'}</span>
+              <span className="text-ink">{tenant.email || '-'}</span>
             </div>
             <div className="px-5 py-3 flex justify-between text-sm">
               <span className="text-secondary">Phone</span>
-              <span className="text-ink">{tenant.phone || '—'}</span>
+              <span className="text-ink">{tenant.phone || '-'}</span>
             </div>
             <div className="px-5 py-3 flex justify-between text-sm">
               <span className="text-secondary">Address</span>
-              <span className="text-ink">{tenant.address || '—'}</span>
+              <span className="text-ink">{tenant.address || '-'}</span>
             </div>
             <div className="px-5 py-3 flex justify-between text-sm">
               <span className="text-secondary">Booking URL</span>

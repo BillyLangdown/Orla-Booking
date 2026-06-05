@@ -10,9 +10,10 @@ const SESSION_PALETTE = [
 ]
 
 const STATUS_COLOURS: Record<BookingStatus, string> = {
-  confirmed: 'bg-green-50 text-green-700 ring-green-200',
-  pending:   'bg-amber-50 text-amber-700 ring-amber-200',
-  cancelled: 'bg-slate-50 text-slate-500 ring-slate-200',
+  confirmed:        'bg-green-50 text-green-700 ring-green-200',
+  pending:          'bg-amber-50 text-amber-700 ring-amber-200',
+  cancelled:        'bg-slate-50 text-slate-500 ring-slate-200',
+  awaiting_payment: 'bg-blue-50 text-blue-700 ring-blue-200',
 }
 
 function sessionColour(type: string): string {

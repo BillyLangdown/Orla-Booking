@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
     startIso:      start,
     endIso:        end,
     organizerName:  '',
-    organizerEmail: 'noreply@example.com',
+    organizerEmail: 'noreply@slickbooking.com',
   })
 
   return new NextResponse(icsContent, {
