@@ -62,6 +62,10 @@ export async function createBookingAction(
     }
 
     if (needsPayment && tenant) {
+      const account = await stripe.accounts.retrieve(tenant.stripeAccountId!)
+      if (!account.charges_enabled) {
+        return { error: 'Payments are not available for this business yet. Please contact them directly.' }
+      }
       const checkoutUrl = await createCheckoutSession({
         bookingId:        booking.id,
         tenantId:         booking.tenantId,
