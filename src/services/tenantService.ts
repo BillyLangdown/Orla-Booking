@@ -27,6 +27,8 @@ function mapTenant(row: Record<string, unknown>): Tenant {
     sessionTypePrices:       (row.session_type_prices         as SessionTypePrices) ?? {},
     currency:                (row.currency                    as string)       ?? 'gbp',
     showPricesOnBookingPage: (row.show_prices_on_booking_page as boolean)      ?? false,
+    googleConnected:         (row.google_calendar_connected   as boolean)      ?? false,
+    googleConnectedEmail:    (row.google_connected_email      as string)       ?? undefined,
   }
 }
 

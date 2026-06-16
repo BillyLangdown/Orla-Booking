@@ -5,6 +5,11 @@ import { usePathname } from 'next/navigation'
 
 const NAV = [
   {
+    href: '/dashboard/ask-orla',
+    label: 'Ask Orla',
+    icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0014 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="9" y1="22" x2="15" y2="22"/></svg>,
+  },
+  {
     href: '/dashboard/bookings',
     label: 'Today',
     icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2.5" y="4.5" width="15" height="12" rx="1.5" stroke="currentColor" strokeWidth="1.6"/><path d="M7 2.5v4M13 2.5v4M2.5 9h15" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>,

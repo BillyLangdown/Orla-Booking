@@ -39,6 +39,7 @@ function mapBooking(row: Record<string, unknown>): Booking {
     stripePaymentIntentId: (row.stripe_payment_intent_id as string) ?? undefined,
     paymentAuthorizedAt:   (row.payment_authorized_at as string) ?? undefined,
     amountPaid:            (row.amount_paid as number) ?? undefined,
+    googleEventId:         (row.google_event_id as string) ?? undefined,
   }
 }
 

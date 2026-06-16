@@ -4,6 +4,7 @@ import { adminSupabase } from '@/lib/supabase/admin'
 import { bookingService } from '@/services/bookingService'
 import { tenantService } from '@/services/tenantService'
 import { sendBookingConfirmation, sendAdminNotification } from '@/lib/email'
+import { createCalendarEvent } from '@/lib/google'
 import type Stripe from 'stripe'
 
 export async function POST(req: NextRequest) {
@@ -91,6 +92,13 @@ export async function POST(req: NextRequest) {
           }
           if (startTime && endTime) {
             await sendBookingConfirmation(booking, startTime, endTime, tenant)
+            if (tenant.googleConnected) {
+              try {
+                await createCalendarEvent(tenant.id, booking, startTime, endTime)
+              } catch {
+                // calendar sync failures are non-fatal
+              }
+            }
           }
         }
       }

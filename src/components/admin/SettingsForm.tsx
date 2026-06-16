@@ -10,10 +10,11 @@ import IntakeBuilder from './IntakeBuilder'
 import SessionTypeEditor from './SessionTypeEditor'
 import BookingPageLink from './BookingPageLink'
 import PaymentSettings from './PaymentSettings'
+import GoogleConnect from './GoogleConnect'
 
 interface Props { tenant: Tenant; slotSessionTypes?: string[]; resources?: Resource[] }
 
-type View = 'menu' | 'business' | 'services' | 'booking' | 'questions' | 'payments'
+type View = 'menu' | 'business' | 'services' | 'booking' | 'questions' | 'payments' | 'integrations'
 
 const inputClass = 'w-full bg-white border border-border px-3 py-3 text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/20 transition rounded-md'
 
@@ -238,6 +239,15 @@ export default function SettingsForm({ tenant, slotSessionTypes = [], resources:
 
         <MenuLabel title="Payments" />
         <MenuGroup><MenuRow label="Payment settings" value={paymentPreview} onClick={() => goTo('payments')} /></MenuGroup>
+
+        <MenuLabel title="Integrations" />
+        <MenuGroup>
+          <MenuRow
+            label="Google"
+            value={tenant.googleConnected ? 'Connected' : undefined}
+            onClick={() => goTo('integrations')}
+          />
+        </MenuGroup>
       </div>
     )
   }
@@ -432,6 +442,16 @@ export default function SettingsForm({ tenant, slotSessionTypes = [], resources:
       <div key={slideKey} className={`flex flex-col gap-4 max-w-xl ${animClass}`}>
         <SubHead title="Payment settings" onBack={() => goTo('menu')} />
         <PaymentSettings tenant={tenant} sessionTypes={sessionTypes} />
+      </div>
+    )
+  }
+
+  // ── INTEGRATIONS ──
+  if (view === 'integrations') {
+    return (
+      <div key={slideKey} className={`flex flex-col gap-4 max-w-xl ${animClass}`}>
+        <SubHead title="Integrations" onBack={() => goTo('menu')} />
+        <GoogleConnect tenant={tenant} />
       </div>
     )
   }

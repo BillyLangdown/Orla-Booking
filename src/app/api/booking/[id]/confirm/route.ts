@@ -3,6 +3,7 @@ import { bookingService } from '@/services/bookingService'
 import { tenantService } from '@/services/tenantService'
 import { adminSupabase } from '@/lib/supabase/admin'
 import { sendBookingConfirmation } from '@/lib/email'
+import { createCalendarEvent } from '@/lib/google'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL
   ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
@@ -33,6 +34,13 @@ export async function GET(
 
     if (tenant && startTime && endTime) {
       await sendBookingConfirmation(confirmed, startTime, endTime, tenant)
+      if (tenant.googleConnected) {
+        try {
+          await createCalendarEvent(tenant.id, confirmed, startTime, endTime)
+        } catch {
+          // calendar sync failures are non-fatal
+        }
+      }
     }
 
     return page(

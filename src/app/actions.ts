@@ -9,6 +9,7 @@ import { resourceService } from '@/services/resourceService'
 import { adminSupabase } from '@/lib/supabase/admin'
 import { sendBookingConfirmation, sendAdminNotification, sendPaymentLink } from '@/lib/email'
 import { stripe, createCheckoutSession, capturePaymentIntent, cancelPaymentIntent } from '@/lib/stripe'
+import { createCalendarEvent, deleteCalendarEvent, disconnectGoogleAccount } from '@/lib/google'
 import type { Booking, CreateBookingInput, CreateSlotInput, IntakeQuestion, PaymentMode, SessionTypePrices, UpdateTenantInput } from '@/types'
 
 function getPaymentAmount(
@@ -83,6 +84,13 @@ export async function createBookingAction(
 
     if (tenant && autoConfirm) {
       await sendBookingConfirmation(booking, input.startTime, input.endTime, tenant)
+      if (tenant.googleConnected) {
+        try {
+          await createCalendarEvent(tenant.id, booking, input.startTime, input.endTime)
+        } catch {
+          // calendar sync failures are non-fatal
+        }
+      }
     }
 
     return { booking }
@@ -101,6 +109,16 @@ export async function cancelBookingAction(bookingId: string): Promise<{ error?: 
           await cancelPaymentIntent(booking.stripePaymentIntentId, tenant.stripeAccountId)
         } catch {
           // non-fatal — Stripe auto-releases uncaptured holds after 7 days
+        }
+      }
+    }
+    if (booking?.googleEventId) {
+      const tenant = await tenantService.getTenantById(booking.tenantId)
+      if (tenant?.googleConnected) {
+        try {
+          await deleteCalendarEvent(tenant.id, booking.googleEventId)
+        } catch {
+          // non-fatal — stale calendar event is a minor inconvenience
         }
       }
     }
@@ -138,9 +156,12 @@ export async function confirmBookingAction(bookingId: string): Promise<{ error?:
         const times = await resolveBookingTimes(booking)
         if (tenant && times) {
           await sendBookingConfirmation(booking, times.startTime, times.endTime, tenant)
+          if (tenant.googleConnected) {
+            await createCalendarEvent(tenant.id, booking, times.startTime, times.endTime)
+          }
         }
       } catch {
-        // email failures are non-fatal
+        // email/calendar failures are non-fatal
       }
     } else if (needsPayment && tenant) {
       // No authorized PI yet — send payment link, webhook confirms after payment
@@ -167,9 +188,12 @@ export async function confirmBookingAction(bookingId: string): Promise<{ error?:
         const times = await resolveBookingTimes(booking)
         if (tenant && times) {
           await sendBookingConfirmation(booking, times.startTime, times.endTime, tenant)
+          if (tenant.googleConnected) {
+            await createCalendarEvent(tenant.id, booking, times.startTime, times.endTime)
+          }
         }
       } catch {
-        // email failures are non-fatal
+        // email/calendar failures are non-fatal
       }
     }
 
@@ -274,6 +298,16 @@ export async function disconnectStripeAction(tenantId: string): Promise<{ error?
     return {}
   } catch (err) {
     return { error: err instanceof Error ? err.message : 'Failed to disconnect Stripe' }
+  }
+}
+
+export async function disconnectGoogleAction(tenantId: string): Promise<{ error?: string }> {
+  try {
+    await disconnectGoogleAccount(tenantId)
+    revalidatePath('/dashboard/settings')
+    return {}
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : 'Failed to disconnect Google' }
   }
 }
 

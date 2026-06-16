@@ -47,6 +47,8 @@ export interface Tenant {
   sessionTypePrices: SessionTypePrices
   currency: string
   showPricesOnBookingPage: boolean
+  googleConnected: boolean
+  googleConnectedEmail?: string
 }
 
 export interface Resource {
@@ -91,6 +93,7 @@ export interface Booking {
   stripePaymentIntentId?: string
   paymentAuthorizedAt?: string
   amountPaid?: number
+  googleEventId?: string
 }
 
 export interface CreateSlotInput {
