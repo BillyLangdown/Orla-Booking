@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
         const kwMsg = await anthropic.messages.create({
           model: 'claude-haiku-4-5',
           max_tokens: 40,
-          system: 'Extract the core search topic from the message and return 3-4 closely related Gmail search terms joined with OR. Only include genuinely synonymous or commonly associated terms — do not broaden too far. Reply with just the query string, nothing else. Example input: "find emails about motorbike tests" → Example output: "motorbike test OR motorcycle test OR CBT OR DAS"',
+          system: 'Extract the core search topic from the message and return 3-5 individual keywords or short terms joined with OR for a Gmail search. Prefer single words over phrases so Gmail matches broadly. Only include genuinely related terms. Reply with just the query string, nothing else. Example input: "find emails about motorbike tests" → Example output: "motorbike OR motorcycle OR CBT OR DAS OR riding"',
           messages: [{ role: 'user', content: query }],
         })
         const gmailQuery = kwMsg.content[0].type === 'text' ? kwMsg.content[0].text.trim() : query
