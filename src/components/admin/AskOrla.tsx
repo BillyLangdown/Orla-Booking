@@ -41,7 +41,7 @@ const EYE_CIRC = 2 * Math.PI * EYE_R
 const ARC_HALF = EYE_CIRC / 2
 
 const QUICK_PRESETS = [
-  { label: 'Daily rundown', query: 'Give me my daily rundown — recent emails that need replies, today\'s bookings, and any recent cancellations or changes.' },
+  { label: 'Daily rundown', query: 'Give me my daily rundown — today\'s bookings and any recent emails that need a reply.' },
   { label: 'Who\'s in today?', query: 'Who are my bookings for today?' },
   { label: 'Emails to reply to?', query: 'Are there any recent emails I should reply to?' },
   { label: 'Recent cancellations', query: 'Have there been any recent cancellations or changes to bookings?' },
