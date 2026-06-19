@@ -145,6 +145,42 @@ export const bookingService = {
     if (error) throw new Error(error.message)
   },
 
+  async rescheduleBooking(bookingId: string, newSlotId: string): Promise<{ date: string; startTime: string; endTime: string; sessionType: string }> {
+    const booking = await this.getBookingById(bookingId)
+    if (!booking) throw new Error('Booking not found')
+
+    const { data: newSlotRow, error: slotErr } = await supabase
+      .from('availability_slots')
+      .select('start_time, end_time, session_type, booked, capacity')
+      .eq('id', newSlotId)
+      .single()
+
+    if (slotErr || !newSlotRow) throw new Error('New slot not found')
+    const ns = newSlotRow as { start_time: string; end_time: string; session_type: string; booked: number; capacity: number }
+    if (ns.booked >= ns.capacity) throw new Error('That slot is fully booked')
+
+    await supabase.rpc('release_slot', { p_slot_id: booking.slotId })
+
+    const { data: claimed } = await supabase.rpc('claim_slot', { p_slot_id: newSlotId })
+    if (!claimed) {
+      await supabase.rpc('claim_slot', { p_slot_id: booking.slotId })
+      throw new Error('Could not claim the new slot — it may have just filled up')
+    }
+
+    const { error: updateErr } = await supabase
+      .from('bookings')
+      .update({ slot_id: newSlotId, start_time: ns.start_time, end_time: ns.end_time, session_type: ns.session_type })
+      .eq('id', bookingId)
+
+    if (updateErr) {
+      await supabase.rpc('release_slot', { p_slot_id: newSlotId })
+      await supabase.rpc('claim_slot', { p_slot_id: booking.slotId })
+      throw new Error(updateErr.message)
+    }
+
+    return { date: isoToDate(ns.start_time), startTime: isoToTime(ns.start_time), endTime: isoToTime(ns.end_time), sessionType: ns.session_type }
+  },
+
   async cancelBooking(bookingId: string): Promise<void> {
     const { error } = await supabase
       .from('bookings')

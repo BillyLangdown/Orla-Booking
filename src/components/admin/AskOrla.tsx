@@ -59,8 +59,10 @@ export default function AskOrla({ bookings, slots }: { bookings: Booking[]; slot
   const [lastEmails, setLastEmails]     = useState<GmailSnippet[]>([])
   const [replyCard, setReplyCard]       = useState<OrlaCard | null>(null)
   const [replyText, setReplyText]       = useState('')
-  const [noteCard, setNoteCard]         = useState<OrlaCard | null>(null)
-  const [noteText, setNoteText]         = useState('')
+  const [noteCard, setNoteCard]               = useState<OrlaCard | null>(null)
+  const [noteText, setNoteText]               = useState('')
+  const [rescheduleCard, setRescheduleCard]   = useState<OrlaCard | null>(null)
+  const [rescheduleText, setRescheduleText]   = useState('')
   const [error, setError]               = useState('')
   const [isBlinking, setIsBlinking]     = useState(false)
   const [gaze, setGaze]                 = useState({ x: 0, y: 0 })
@@ -115,6 +117,8 @@ export default function AskOrla({ bookings, slots }: { bookings: Booking[]; slot
     setReplyText('')
     setNoteCard(null)
     setNoteText('')
+    setRescheduleCard(null)
+    setRescheduleText('')
     setError('')
   }
 
@@ -185,10 +189,14 @@ export default function AskOrla({ bookings, slots }: { bookings: Booking[]; slot
     }
   }
 
-  function triggerBookingAction(card: OrlaCard, action: 'cancel_booking' | 'no_show' | 'add_note') {
+  function triggerBookingAction(card: OrlaCard, action: 'cancel_booking' | 'no_show' | 'add_note' | 'reschedule_booking') {
     if (!card.bookingId || !card.bookingName) return
     if (action === 'add_note') {
       setNoteCard(card)
+      return
+    }
+    if (action === 'reschedule_booking') {
+      setRescheduleCard(card)
       return
     }
     const intent: OrlaAction = action === 'cancel_booking'
@@ -213,6 +221,14 @@ export default function AskOrla({ bookings, slots }: { bookings: Booking[]; slot
     setNoteCard(null)
     setNoteText('')
     setState('confirming')
+  }
+
+  function submitReschedule() {
+    if (!rescheduleCard?.bookingId || !rescheduleText.trim()) return
+    const q = `Reschedule [ID:${rescheduleCard.bookingId}] ${rescheduleCard.bookingName}'s booking to ${rescheduleText}`
+    setRescheduleCard(null)
+    setRescheduleText('')
+    submitQuery(q)
   }
 
   function submitReplyDraft() {
@@ -484,6 +500,38 @@ export default function AskOrla({ bookings, slots }: { bookings: Booking[]; slot
         </div>
       )}
 
+      {/* Reschedule input panel */}
+      {rescheduleCard && (
+        <div className="w-full rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden"
+          style={{ animation: 'orla-card-in 0.25s ease both' }}>
+          <div className="px-4 pt-4 pb-2 border-b border-gray-100">
+            <p className="text-xs text-gray-400">Rescheduling</p>
+            <p className="text-sm font-semibold text-gray-800">{rescheduleCard.bookingName}</p>
+            <p className="text-xs text-gray-400">{rescheduleCard.meta}</p>
+          </div>
+          <div className="p-4 flex flex-col gap-3">
+            <textarea
+              value={rescheduleText}
+              onChange={e => setRescheduleText(e.target.value)}
+              placeholder="When would you like to move this to? (e.g. next Friday at 9am)"
+              rows={2}
+              className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-teal-300 resize-none placeholder:text-gray-400"
+            />
+            <div className="flex gap-2">
+              <button onClick={submitReschedule} disabled={!rescheduleText.trim()}
+                className="flex-1 py-2.5 rounded-lg text-sm font-semibold text-white disabled:opacity-40 transition-colors"
+                style={{ background: '#0d9488' }}>
+                Find slot
+              </button>
+              <button onClick={() => { setRescheduleCard(null); setRescheduleText('') }}
+                className="px-4 py-2.5 rounded-lg text-sm font-medium text-gray-500 bg-gray-100 hover:bg-gray-200 transition-colors">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Answer cards + suggestions */}
       {state === 'answered' && (
         <div className="w-full flex flex-col gap-3">
@@ -590,7 +638,7 @@ function ResultCard({
   card: OrlaCard
   index: number
   onReply?: (card: OrlaCard) => void
-  onBookingAction?: (card: OrlaCard, action: 'cancel_booking' | 'no_show' | 'add_note') => void
+  onBookingAction?: (card: OrlaCard, action: 'cancel_booking' | 'no_show' | 'add_note' | 'reschedule_booking') => void
 }) {
   const accent = CARD_ACCENT[card.type] ?? CARD_ACCENT.info
   const icon = card.type === 'email' ? <EmailIcon color={accent} />
@@ -646,6 +694,11 @@ function ResultCard({
             <button onClick={() => onBookingAction(card, 'add_note')}
               className="text-xs text-gray-400 hover:text-blue-500 transition-colors font-medium">
               Add note
+            </button>
+            <span className="text-gray-200">·</span>
+            <button onClick={() => onBookingAction(card, 'reschedule_booking')}
+              className="text-xs text-gray-400 hover:text-teal-500 transition-colors font-medium">
+              Reschedule
             </button>
           </div>
         )}

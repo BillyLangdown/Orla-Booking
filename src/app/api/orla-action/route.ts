@@ -14,7 +14,9 @@ export type OrlaAction =
   | { action: 'send_reminder';   bookingId: string; bookingName: string; email: string }
   | { action: 'create_booking';  slotId: string; name: string; email: string; phone?: string; sessionType: string; startTime: string; endTime: string }
   | { action: 'block_time';      slotIds: string[]; description: string }
-  | { action: 'reply_email';     threadId: string; inReplyToMessageId: string; to: string; subject: string; body: string }
+  | { action: 'reply_email';          threadId: string; inReplyToMessageId: string; to: string; subject: string; body: string }
+  | { action: 'reschedule_booking';   bookingId: string; bookingName: string; newSlotId: string; newSlotDescription: string }
+  | { action: 'create_slot';          sessionType: string; date: string; startTime: string; endTime: string; capacity: number; description: string }
 
 export async function POST(req: NextRequest) {
   const tenant = await getAuthTenant()
@@ -128,6 +130,29 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
           summary: `Reply sent to ${intent.to}.`,
           cards: [{ type: 'email', title: `Re: ${intent.subject}`, meta: `To: ${intent.to}`, body: intent.body }],
+        })
+      }
+
+      case 'reschedule_booking': {
+        const result = await bookingService.rescheduleBooking(intent.bookingId, intent.newSlotId)
+        return NextResponse.json({
+          summary: `${intent.bookingName}'s booking has been moved to ${result.date} at ${result.startTime}.`,
+          cards: [{ type: 'booking', title: intent.bookingName, meta: `${result.date} · ${result.startTime}–${result.endTime} · ${result.sessionType}`, body: 'Rescheduled' }],
+        })
+      }
+
+      case 'create_slot': {
+        await availabilityService.createSlot({
+          tenantId:    tenant.id,
+          sessionType: intent.sessionType,
+          date:        intent.date,
+          startTime:   intent.startTime,
+          endTime:     intent.endTime,
+          capacity:    intent.capacity,
+        })
+        return NextResponse.json({
+          summary: `Slot created: ${intent.sessionType} on ${intent.date} at ${intent.startTime}.`,
+          cards: [{ type: 'info', title: 'Slot created', body: `${intent.sessionType} · ${intent.date} · ${intent.startTime}–${intent.endTime} · ${intent.capacity} space${intent.capacity === 1 ? '' : 's'}` }],
         })
       }
 

@@ -14,7 +14,7 @@ const NAV = [
   },
   {
     href: '/dashboard/bookings',
-    label: 'Today',
+    label: 'Bookings',
     icon: <svg width="16" height="16" viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="11" rx="1.5" stroke="currentColor" strokeWidth="1.6"/><path d="M6 2v4M12 2v4M2 8h14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>,
   },
   {

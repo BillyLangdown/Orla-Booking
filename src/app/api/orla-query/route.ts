@@ -89,7 +89,7 @@ Respond ONLY with valid JSON — no markdown, no text outside the JSON.
 For QUESTIONS, respond:
 { "type": "answer", "summary": "short friendly intro", "cards": [...], "suggestions": ["up to 3 short follow-up action suggestions"] }
 
-For ACTIONS (cancel, confirm, no-show, add note, send reminder, create booking, block time, reply to email), respond:
+For ACTIONS (cancel, confirm, no-show, add note, send reminder, create booking, block time, reply to email, reschedule booking, create slot), respond:
 { "type": "action", "intent": { ...fields... }, "preview": "Human-readable confirmation question", "cards": [...] }
 
 CARD FORMATS — always include action metadata fields when available:
@@ -110,8 +110,10 @@ ACTION INTENT SCHEMAS:
 - add_note:        { "action":"add_note",        "bookingId":"<[ID:...]>", "bookingName":"...", "note":"..." }
 - send_reminder:   { "action":"send_reminder",   "bookingId":"<[ID:...]>", "bookingName":"...", "email":"..." }
 - create_booking:  { "action":"create_booking",  "slotId":"<[SLOT:...]>", "name":"...", "email":"...", "phone":"...", "sessionType":"...", "startTime":"ISO", "endTime":"ISO" }
-- block_time:      { "action":"block_time",       "slotIds":["<SLOT ids>"], "description":"..." }
-- reply_email:     { "action":"reply_email",      "threadId":"...", "inReplyToMessageId":"...", "to":"...", "subject":"...", "body":"full drafted reply text" }
+- block_time:          { "action":"block_time",          "slotIds":["<SLOT ids>"], "description":"..." }
+- reply_email:         { "action":"reply_email",         "threadId":"...", "inReplyToMessageId":"...", "to":"...", "subject":"...", "body":"full drafted reply text" }
+- reschedule_booking:  { "action":"reschedule_booking",  "bookingId":"<[ID:...]>", "bookingName":"...", "newSlotId":"<[SLOT:...]>", "newSlotDescription":"date · time · session type" }
+- create_slot:         { "action":"create_slot",         "sessionType":"...", "date":"YYYY-MM-DD", "startTime":"HH:MM", "endTime":"HH:MM", "capacity":N, "description":"human summary" }
 
 DAILY RUNDOWN: If asked for a daily rundown or briefing, structure cards as: (1) recent emails likely needing a reply — email cards with full metadata, (2) today's bookings — booking cards, (3) recent cancellations or pending bookings. Keep summary brief and business-like.
 
