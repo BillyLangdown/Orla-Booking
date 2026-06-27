@@ -51,7 +51,7 @@ function durationLabel(start: string, end: string): string {
   return `${h}h ${m}m`
 }
 
-const field = 'w-full border border-border bg-white px-3 py-2 text-sm text-ink focus:outline-none focus:ring-1 focus:ring-ink/20 transition'
+const field = 'w-full border border-border bg-card px-3 py-2 text-sm text-ink focus:outline-none focus:ring-1 focus:ring-ink/20 transition'
 const lbl   = 'text-xs font-medium text-secondary'
 
 interface Props {
@@ -140,7 +140,7 @@ export default function SlotCreateForm({ tenantId, resources, sessionTypes = [],
     <>
       <button
         onClick={() => setOpen(true)}
-        className={`inline-flex items-center justify-center gap-2 bg-ink text-white px-4 py-2 text-sm font-medium hover:bg-ink/85 transition-colors ${fullWidth ? 'w-full' : ''}`}
+        className={`inline-flex items-center justify-center gap-2 bg-accent text-white px-4 py-2 text-sm font-medium hover:bg-accent-hover transition-colors ${fullWidth ? 'w-full' : ''}`}
       >
         <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden>
           <rect x="0.65" y="1.65" width="11.7" height="10.7" rx="1.35" stroke="currentColor" strokeWidth="1.3"/>
@@ -153,7 +153,7 @@ export default function SlotCreateForm({ tenantId, resources, sessionTypes = [],
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={close} />
 
-          <div className="relative bg-white w-full sm:max-w-lg shadow-2xl flex flex-col max-h-[92dvh] overflow-hidden">
+          <div className="relative bg-card w-full sm:max-w-lg shadow-2xl flex flex-col max-h-[92dvh] overflow-hidden">
 
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
@@ -176,7 +176,7 @@ export default function SlotCreateForm({ tenantId, resources, sessionTypes = [],
                 </button>
               ))}
               <div
-                className="absolute bottom-0 h-[2px] bg-ink transition-all duration-200"
+                className="absolute bottom-0 h-[2px] bg-accent transition-all duration-200"
                 style={{ width: '50%', left: mode === 'once' ? '0%' : '50%' }}
               />
             </div>
@@ -242,8 +242,8 @@ export default function SlotCreateForm({ tenantId, resources, sessionTypes = [],
                           onClick={() => toggleDay(recurDays, d.value, setRecurDays)}
                           className={`px-3 py-1.5 text-xs font-medium border transition-colors ${
                             recurDays.includes(d.value)
-                              ? 'bg-ink text-white border-ink'
-                              : 'bg-white text-secondary border-border hover:border-ink/30'
+                              ? 'bg-accent/15 text-accent border-accent/40'
+                              : 'bg-card text-secondary border-border hover:border-accent/30'
                           }`}
                         >
                           {d.label}
@@ -314,8 +314,8 @@ export default function SlotCreateForm({ tenantId, resources, sessionTypes = [],
                           onClick={() => toggleDay(extraDays, d.value, setExtraDays)}
                           className={`px-3 py-1.5 text-xs font-medium border transition-colors disabled:opacity-40 disabled:cursor-default ${
                             isSelected || extraDays.includes(d.value)
-                              ? 'bg-ink text-white border-ink'
-                              : 'bg-white text-secondary border-border hover:border-ink/30'
+                              ? 'bg-accent/15 text-accent border-accent/40'
+                              : 'bg-card text-secondary border-border hover:border-accent/30'
                           }`}
                         >
                           {d.label}
@@ -353,7 +353,7 @@ export default function SlotCreateForm({ tenantId, resources, sessionTypes = [],
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="bg-ink text-white px-4 py-2 text-sm font-medium hover:bg-ink/85 transition-colors disabled:opacity-50"
+                className="bg-accent text-white px-4 py-2 text-sm font-medium hover:bg-accent-hover transition-colors disabled:opacity-50"
               >
                 {saving ? 'Saving…' : `Create ${slotCount > 1 ? `${slotCount} slots` : 'slot'}`}
               </button>

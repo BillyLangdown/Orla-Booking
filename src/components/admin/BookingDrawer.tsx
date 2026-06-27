@@ -69,7 +69,7 @@ export default function BookingDrawer({ booking, onClose }: Props) {
       <div
         role="dialog"
         aria-modal="true"
-        className={`fixed inset-y-0 right-0 z-50 flex w-full flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out sm:w-[440px] sm:rounded-l-xl ${open ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`fixed inset-y-0 right-0 z-50 flex w-full flex-col bg-card shadow-2xl transition-transform duration-300 ease-in-out sm:w-[440px] sm:rounded-l-xl ${open ? 'translate-x-0' : 'translate-x-full'}`}
       >
         {/* Header */}
         <div className="flex shrink-0 flex-col gap-2 px-6 pt-5 pb-4 border-b border-border">
@@ -158,17 +158,17 @@ export default function BookingDrawer({ booking, onClose }: Props) {
               {!confirmCancel ? (
                 <button
                   onClick={() => setConfirmCancel(true)}
-                  className="w-full rounded-xl border border-border py-2.5 text-sm font-medium text-secondary hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 transition-colors"
+                  className="w-full rounded-xl border border-border py-2.5 text-sm font-medium text-secondary hover:border-rose-800/50 hover:bg-rose-950/20 hover:text-rose-400 transition-colors"
                 >
                   Cancel booking
                 </button>
               ) : (
-                <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 flex flex-col gap-2">
-                  <p className="text-sm font-medium text-rose-700 text-center">Cancel this booking?</p>
+                <div className="rounded-xl border border-rose-800/40 bg-rose-950/30 p-3 flex flex-col gap-2">
+                  <p className="text-sm font-medium text-rose-300 text-center">Cancel this booking?</p>
                   <div className="flex gap-2">
                     <button
                       onClick={() => setConfirmCancel(false)}
-                      className="flex-1 rounded-lg border border-border bg-white py-2 text-sm font-medium text-secondary hover:text-ink transition-colors"
+                      className="flex-1 rounded-lg border border-border bg-card py-2 text-sm font-medium text-secondary hover:text-ink transition-colors"
                     >
                       Keep it
                     </button>

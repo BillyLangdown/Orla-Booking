@@ -23,7 +23,7 @@ export default function SlotView({ slots, pricing, onSelect }: Props) {
         <button
           onClick={() => setView('list')}
           className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors ${
-            view === 'list' ? 'bg-ink text-white' : 'bg-white text-secondary hover:text-ink'
+            view === 'list' ? 'bg-accent text-white' : 'bg-card text-secondary hover:text-ink'
           }`}
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -34,7 +34,7 @@ export default function SlotView({ slots, pricing, onSelect }: Props) {
         <button
           onClick={() => setView('calendar')}
           className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors border-l border-border ${
-            view === 'calendar' ? 'bg-ink text-white' : 'bg-white text-secondary hover:text-ink'
+            view === 'calendar' ? 'bg-accent text-white' : 'bg-card text-secondary hover:text-ink'
           }`}
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">

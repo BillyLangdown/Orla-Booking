@@ -37,7 +37,7 @@ export default function SessionTypeEditor({ types, onChange, suggestions = [] }:
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKey}
           placeholder="e.g. Track Day, Coaching Session"
-          className="flex-1 border border-border bg-white px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/30 transition"
+          className="flex-1 border border-border bg-card px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/30 transition"
         />
         <button
           type="button"

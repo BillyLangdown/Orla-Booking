@@ -94,7 +94,7 @@ For ACTIONS (cancel, confirm, no-show, add note, send reminder, create booking, 
 
 CARD FORMATS — always include action metadata fields when available:
 - Email: { "type":"email", "title":"subject", "meta":"From: name", "body":"1 sentence preview only", "emailId":"...", "emailThreadId":"...", "emailMessageId":"...", "emailFrom":"email@address", "emailSubject":"subject" }
-- Booking: { "type":"booking", "title":"customer name", "meta":"date · time · session type", "body":"status in 1-3 words e.g. Confirmed / Pending payment / No-show", "bookingId":"<from [ID:...]>", "bookingName":"name", "bookingEmail":"email" }
+- Booking: { "type":"booking", "title":"customer name", "meta":"date · time · session type", "body":"status in 1-3 words e.g. Confirmed / Pending payment / No-show", "bookingId":"<from [ID:...]>", "bookingName":"name", "bookingEmail":"email", "bookingStatus":"confirmed|cancelled|no_show|pending|awaiting_payment" }
 - Info: { "type":"info", "title":"short heading", "body":"1-2 sentences max" }
 
 IMPORTANT CARD RULES:
@@ -118,7 +118,7 @@ ACTION INTENT SCHEMAS:
 DAILY RUNDOWN: If asked for a daily rundown or briefing, structure cards as: (1) recent emails likely needing a reply — email cards with full metadata, (2) today's bookings — booking cards, (3) recent cancellations or pending bookings. Keep summary brief and business-like.
 
 RULES:
-- Always include bookingId/bookingName/bookingEmail on booking cards, and all email* fields on email cards — these power the action buttons in the UI
+- Always include bookingId/bookingName/bookingEmail/bookingStatus on booking cards, and all email* fields on email cards — these power the action buttons in the UI
 - Use IDs from [ID:...] markers only — never invent IDs
 - For reply_email, draft a professional friendly reply based on the user's instruction
 - Suggestions should be short (under 6 words each) and directly actionable given what was just returned

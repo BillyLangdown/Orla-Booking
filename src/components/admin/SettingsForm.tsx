@@ -16,13 +16,13 @@ interface Props { tenant: Tenant; slotSessionTypes?: string[]; resources?: Resou
 
 type View = 'menu' | 'business' | 'services' | 'booking' | 'questions' | 'payments' | 'integrations'
 
-const inputClass = 'w-full bg-white border border-border px-3 py-3 text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/20 transition rounded-md'
+const inputClass = 'w-full bg-card border border-border px-3 py-3 text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/20 transition rounded-md'
 
 // ─── Menu primitives ──────────────────────────────────────────────────────────
 
 function MenuGroup({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-2xl overflow-hidden border border-border/80 divide-y divide-border/50">
+    <div className="bg-card rounded-2xl overflow-hidden border border-border/80 divide-y divide-border/50">
       {children}
     </div>
   )
@@ -94,7 +94,7 @@ function SubHead({ title, onBack }: { title: string; onBack: () => void }) {
 
 function SettingCard({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-2xl border border-border/80 px-5 py-4 flex flex-col gap-5">
+    <div className="bg-card rounded-2xl border border-border/80 px-5 py-4 flex flex-col gap-5">
       {children}
     </div>
   )

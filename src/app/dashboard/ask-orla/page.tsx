@@ -23,10 +23,8 @@ export default async function AskOrlaPage() {
   })
 
   return (
-    <div className="flex min-h-full items-center justify-center py-8">
-      <div className="w-full max-w-xl">
-        <AskOrla bookings={bookings} slots={slots} />
-      </div>
+    <div className="flex flex-col h-[calc(100dvh-10rem)] md:h-[calc(100dvh-4rem)]">
+      <AskOrla bookings={bookings} slots={slots} />
     </div>
   )
 }

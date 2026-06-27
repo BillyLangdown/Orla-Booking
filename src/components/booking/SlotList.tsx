@@ -38,8 +38,8 @@ export default function SlotList({ slots, pricing, onSelect }: Props) {
               className={[
                 'px-3 py-1 text-xs font-medium transition-colors',
                 filter === t
-                  ? 'bg-ink text-white'
-                  : 'bg-white border border-border text-secondary hover:text-ink',
+                  ? 'bg-accent text-white'
+                  : 'bg-card border border-border text-secondary hover:text-ink',
               ].join(' ')}
             >
               {t}

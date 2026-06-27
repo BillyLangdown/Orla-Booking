@@ -27,7 +27,7 @@ function formatBookedOn(iso: string) {
 export default function BookingTable({ bookings, onSelect }: Props) {
   if (bookings.length === 0) {
     return (
-      <div className="bg-white shadow-sm py-20 text-center">
+      <div className="bg-card shadow-sm py-20 text-center">
         <p className="text-sm font-medium text-ink">No bookings yet</p>
         <p className="text-xs text-secondary mt-1">Bookings will appear here once customers start booking.</p>
       </div>
@@ -47,7 +47,7 @@ export default function BookingTable({ bookings, onSelect }: Props) {
       {Object.entries(grouped)
         .sort(([a], [b]) => b.localeCompare(a)) // newest first
         .map(([date, dateBookings]) => (
-          <div key={date} className="bg-white shadow-sm overflow-hidden">
+          <div key={date} className="bg-card shadow-sm overflow-hidden">
             {/* Date heading */}
             <div className="border-b border-border bg-subtle px-5 py-3 flex items-center justify-between">
               <p className="text-xs font-semibold text-secondary">

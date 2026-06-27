@@ -74,7 +74,7 @@ export default function PaymentSettings({ tenant, sessionTypes }: Props) {
     <div className="flex flex-col gap-4">
 
       {/* Payment mode */}
-      <div className="bg-white shadow-sm p-4 sm:p-5 flex flex-col gap-3">
+      <div className="bg-card shadow-sm p-4 sm:p-5 flex flex-col gap-3">
         <div>
           <p className="text-sm font-semibold text-ink">Payment mode</p>
           <p className="text-xs text-secondary mt-0.5">Choose how customers pay when they book.</p>
@@ -89,7 +89,7 @@ export default function PaymentSettings({ tenant, sessionTypes }: Props) {
               key={value}
               className={[
                 'flex items-start gap-3 p-3 border cursor-pointer transition-colors',
-                paymentMode === value ? 'border-ink bg-ink/[0.03]' : 'border-border hover:bg-gray-50',
+                paymentMode === value ? 'border-ink bg-ink/[0.03]' : 'border-border hover:bg-subtle',
               ].join(' ')}
             >
               <input
@@ -116,7 +116,7 @@ export default function PaymentSettings({ tenant, sessionTypes }: Props) {
 
       {/* Show prices on booking page toggle */}
       {stripeReady && (
-        <div className="bg-white shadow-sm p-4 sm:p-5">
+        <div className="bg-card shadow-sm p-4 sm:p-5">
           <label className="flex items-start justify-between gap-4 cursor-pointer">
             <div className="flex flex-col gap-1 flex-1">
               <span className="text-sm font-medium text-ink">Show prices on booking page</span>
@@ -139,7 +139,7 @@ export default function PaymentSettings({ tenant, sessionTypes }: Props) {
 
       {/* Prices per session type */}
       {showPriceInputs && (
-        <div className="bg-white shadow-sm p-4 sm:p-5 flex flex-col gap-3">
+        <div className="bg-card shadow-sm p-4 sm:p-5 flex flex-col gap-3">
           <div>
             <p className="text-sm font-semibold text-ink">Pricing by service</p>
             <p className="text-xs text-secondary mt-0.5">
@@ -162,7 +162,7 @@ export default function PaymentSettings({ tenant, sessionTypes }: Props) {
                       value={rawInputs[`${type}:price`] ?? ''}
                       onChange={e => handleRawChange(type, 'price', e.target.value)}
                       onBlur={e => commitPrice(type, 'price', e.target.value)}
-                      className="w-28 border border-border bg-white px-2 py-1.5 text-sm text-ink text-right focus:outline-none focus:ring-2 focus:ring-ink/20"
+                      className="w-28 border border-border bg-card px-2 py-1.5 text-sm text-ink text-right focus:outline-none focus:ring-2 focus:ring-ink/20"
                     />
                   </div>
                 )}
@@ -177,7 +177,7 @@ export default function PaymentSettings({ tenant, sessionTypes }: Props) {
                         value={rawInputs[`${type}:price`] ?? ''}
                         onChange={e => handleRawChange(type, 'price', e.target.value)}
                         onBlur={e => commitPrice(type, 'price', e.target.value)}
-                        className="w-28 border border-border bg-white px-2 py-1.5 text-sm text-ink text-right focus:outline-none focus:ring-2 focus:ring-ink/20"
+                        className="w-28 border border-border bg-card px-2 py-1.5 text-sm text-ink text-right focus:outline-none focus:ring-2 focus:ring-ink/20"
                       />
                     </div>
                     <div className="flex items-center gap-1.5">
@@ -188,7 +188,7 @@ export default function PaymentSettings({ tenant, sessionTypes }: Props) {
                         value={rawInputs[`${type}:depositAmount`] ?? ''}
                         onChange={e => handleRawChange(type, 'depositAmount', e.target.value)}
                         onBlur={e => commitPrice(type, 'depositAmount', e.target.value)}
-                        className="w-28 border border-border bg-white px-2 py-1.5 text-sm text-ink text-right focus:outline-none focus:ring-2 focus:ring-ink/20"
+                        className="w-28 border border-border bg-card px-2 py-1.5 text-sm text-ink text-right focus:outline-none focus:ring-2 focus:ring-ink/20"
                       />
                     </div>
                   </div>

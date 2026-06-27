@@ -71,7 +71,7 @@ export default function CalendarView({ bookings, onSelect }: Props) {
       </div>
 
       {/* Grid */}
-      <div className="bg-white shadow-sm p-4">
+      <div className="bg-card shadow-sm p-4">
         <div className="grid grid-cols-7 mb-2">
           {DAY_LABELS.map((d, i) => (
             <div key={i} className="flex items-center justify-center py-1">
@@ -123,7 +123,7 @@ export default function CalendarView({ bookings, onSelect }: Props) {
               <div
                 key={b.id}
                 onClick={() => onSelect(b)}
-                className="bg-white shadow-sm px-4 py-3 cursor-pointer hover:bg-subtle/60 transition-colors flex items-center gap-4"
+                className="bg-card shadow-sm px-4 py-3 cursor-pointer hover:bg-subtle/60 transition-colors flex items-center gap-4"
               >
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm text-ink">{b.name}</p>

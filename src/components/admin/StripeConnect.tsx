@@ -38,7 +38,7 @@ export default function StripeConnect({ tenant }: Props) {
 
   if (tenant.stripeOnboarded) {
     return (
-      <div className="bg-white shadow-sm p-4 sm:p-5 flex items-start justify-between gap-4">
+      <div className="bg-card shadow-sm p-4 sm:p-5 flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1 min-w-0">
           <p className="text-sm font-semibold text-ink">Stripe</p>
           <p className="font-mono text-[11px] text-muted truncate">{tenant.stripeAccountId}</p>
@@ -64,7 +64,7 @@ export default function StripeConnect({ tenant }: Props) {
   }
 
   return (
-    <div className="bg-white shadow-sm p-4 sm:p-5 flex flex-col gap-4">
+    <div className="bg-card shadow-sm p-4 sm:p-5 flex flex-col gap-4">
       <div>
         <p className="text-sm font-semibold text-ink">Connect your Stripe account</p>
         <p className="text-xs text-secondary mt-1 leading-relaxed">

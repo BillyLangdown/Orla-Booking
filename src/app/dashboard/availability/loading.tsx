@@ -19,7 +19,7 @@ export default function AvailabilityLoading() {
         </div>
         <div className="h-8 w-24 rounded-md bg-border animate-pulse" />
       </div>
-      <div className="overflow-hidden rounded-xl border border-border bg-white">
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
         <div className="border-b border-border bg-subtle px-5 py-3">
           <div className="h-3 w-24 rounded bg-border animate-pulse" />
         </div>

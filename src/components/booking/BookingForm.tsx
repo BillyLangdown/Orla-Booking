@@ -25,7 +25,7 @@ function IntakeField({
   value: string
   onChange: (v: string) => void
 }) {
-  const inputClass = 'w-full border border-border bg-white px-3.5 py-3 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-accent/20 transition rounded-md'
+  const inputClass = 'w-full border border-border bg-card px-3.5 py-3 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-accent/20 transition rounded-md'
 
   if (question.type === 'dropdown') {
     return (
@@ -60,7 +60,7 @@ function IntakeField({
               className={`flex-1 border rounded-md py-3 text-sm font-medium transition-all ${
                 value === opt.toLowerCase()
                   ? 'border-accent bg-accent/8 text-accent'
-                  : 'border-border text-secondary hover:border-secondary bg-white'
+                  : 'border-border text-secondary hover:border-accent/40 hover:text-accent bg-card'
               }`}
             >
               {opt}
@@ -83,6 +83,7 @@ function IntakeField({
         onChange={(e) => onChange(e.target.value)}
         className={inputClass}
         placeholder={question.type === 'number' ? '0' : ''}
+        maxLength={question.type === 'number' ? undefined : 100}
       />
     </div>
   )

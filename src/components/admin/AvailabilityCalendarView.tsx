@@ -62,7 +62,7 @@ export default function AvailabilityCalendarView({ slots }: Props) {
         </button>
       </div>
 
-      <div className="bg-white shadow-sm p-4">
+      <div className="bg-card shadow-sm p-4">
         <div className="grid grid-cols-7 mb-2">
           {DAY_LABELS.map((d, i) => (
             <div key={i} className="flex items-center justify-center py-1">
@@ -123,7 +123,7 @@ export default function AvailabilityCalendarView({ slots }: Props) {
             const pct = s.capacity > 0 ? s.booked / s.capacity : 0
             const bar = pct >= 1 ? 'bg-rose-400' : pct >= 0.5 ? 'bg-amber-400' : 'bg-emerald-400'
             return (
-              <div key={s.id} className="bg-white shadow-sm px-4 py-3 flex items-center gap-4">
+              <div key={s.id} className="bg-card shadow-sm px-4 py-3 flex items-center gap-4">
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm text-ink">{s.resource?.name ?? 'Unassigned'}</p>
                   <p className="text-xs text-secondary mt-0.5">{s.startTime} – {s.endTime} · {s.sessionType}</p>

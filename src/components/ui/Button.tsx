@@ -11,7 +11,7 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const VARIANTS: Record<Variant, string> = {
   primary:   'bg-accent text-white hover:bg-accent-hover',
-  secondary: 'bg-white text-ink border border-border hover:bg-subtle',
+  secondary: 'bg-card text-ink border border-border hover:bg-subtle',
   ghost:     'text-secondary hover:text-ink hover:bg-subtle',
 }
 

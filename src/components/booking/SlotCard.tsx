@@ -55,7 +55,7 @@ export default function SlotCard({ slot, pricing, onSelect }: Props) {
   return (
     <button
       onClick={() => onSelect(slot)}
-      className="w-full text-left bg-white shadow-sm px-4 py-4 hover:shadow transition-all duration-150 group"
+      className="w-full text-left bg-card border border-border/50 rounded-xl px-4 py-4 hover:border-accent/30 transition-all duration-150 group"
     >
       <div className="flex items-center justify-between gap-4">
         <div className="flex flex-col gap-1.5 min-w-0">

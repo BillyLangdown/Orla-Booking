@@ -73,7 +73,7 @@ export default function BookingCalendar({ slots, onSelect }: Props) {
         <button
           onClick={prevMonth}
           aria-label="Previous month"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-white text-secondary hover:text-ink hover:bg-subtle transition-colors"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-card text-secondary hover:text-ink hover:bg-subtle transition-colors"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -83,7 +83,7 @@ export default function BookingCalendar({ slots, onSelect }: Props) {
         <button
           onClick={nextMonth}
           aria-label="Next month"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-white text-secondary hover:text-ink hover:bg-subtle transition-colors"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-card text-secondary hover:text-ink hover:bg-subtle transition-colors"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path d="M6 12l4-4-4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>

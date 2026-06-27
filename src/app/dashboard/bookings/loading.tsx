@@ -18,7 +18,7 @@ export default function BookingsLoading() {
         <div className="h-5 w-24 rounded bg-border animate-pulse" />
         <div className="h-3.5 w-16 rounded bg-border animate-pulse mt-1.5" />
       </div>
-      <div className="overflow-hidden rounded-xl border border-border bg-white">
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
         {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)}
       </div>
     </div>

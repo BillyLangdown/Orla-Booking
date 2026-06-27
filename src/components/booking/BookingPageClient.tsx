@@ -173,42 +173,41 @@ export default function BookingPageClient({ tenant, slots }: Props) {
     <div className="min-h-dvh flex flex-col bg-surface">
 
       {/* ── Header ── */}
-      <header style={{ background: '#1F2937' }}>
-        <div className="mx-auto max-w-lg px-5 pt-5 pb-4 flex items-center gap-4">
-          {tenant.logoUrl ? (
-            <img
-              src={tenant.logoUrl}
-              alt={tenant.name}
-              className="h-9 w-auto max-w-[120px] object-contain shrink-0"
-            />
-          ) : (
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 text-white font-semibold shrink-0 text-sm">
-              {tenant.name.charAt(0)}
-            </div>
-          )}
-          <div className="min-w-0">
-            <p className="font-semibold text-white text-sm leading-tight truncate">{tenant.name}</p>
-            {tenant.address && (
-              <p className="text-xs text-white/35 mt-0.5 truncate">{tenant.address}</p>
+      <header style={{ background: '#0B1120' }}>
+        <div className="mx-auto max-w-lg px-5 pt-6 pb-5">
+          <div className="flex items-center gap-3.5">
+            {tenant.logoUrl ? (
+              <img
+                src={tenant.logoUrl}
+                alt={tenant.name}
+                className="h-8 w-auto max-w-[110px] object-contain shrink-0"
+              />
+            ) : (
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent/20 border border-accent/30 text-accent font-bold shrink-0 text-sm">
+                {tenant.name.charAt(0)}
+              </div>
             )}
+            <div className="min-w-0 flex-1">
+              <p className="font-semibold text-white text-[15px] leading-tight truncate">{tenant.name}</p>
+              {tenant.address && (
+                <p className="text-[11px] mt-0.5 truncate" style={{ color: 'rgba(255,255,255,0.38)' }}>{tenant.address}</p>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Step label */}
-        {step !== 'success' && (
-          <div className="mx-auto max-w-lg px-5 pb-3">
-            <p className="text-[11px] text-white/30 tracking-wide">
+          {step !== 'success' && (
+            <p className="text-[11px] mt-3.5 tracking-wide" style={{ color: 'rgba(255,255,255,0.28)' }}>
               {step === 'service' ? 'Choose a service'
                 : step === 'date' ? 'Choose a date'
                 : step === 'time' ? 'Choose a time'
                 : 'Your details'}
             </p>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Progress bar */}
         {step !== 'success' && (
-          <div className="h-[2px] bg-white/8">
+          <div className="h-[2px]" style={{ background: 'rgba(255,255,255,0.06)' }}>
             <div
               className="h-full bg-accent transition-all duration-500 ease-out"
               style={{ width: `${progressPct}%` }}

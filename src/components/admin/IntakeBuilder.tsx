@@ -19,7 +19,7 @@ function uid() {
   return Math.random().toString(36).slice(2, 10)
 }
 
-const fieldCls = 'w-full border border-border bg-white px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-ink/20 transition'
+const fieldCls = 'w-full border border-border bg-card px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-ink/20 transition'
 
 export default function IntakeBuilder({ questions, onChange }: Props) {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
@@ -61,13 +61,13 @@ export default function IntakeBuilder({ questions, onChange }: Props) {
   return (
     <div className="flex flex-col gap-3">
       {questions.length === 0 && (
-        <p className="text-sm text-secondary text-center py-6 bg-white border border-dashed border-border rounded-[10px]">
+        <p className="text-sm text-secondary text-center py-6 bg-card border border-dashed border-border rounded-[10px]">
           No questions yet. Add one below.
         </p>
       )}
 
       {questions.map((q, i) => (
-        <div key={q.id} className="bg-white border border-border rounded-[10px] overflow-hidden">
+        <div key={q.id} className="bg-card border border-border rounded-[10px] overflow-hidden">
 
           {/* Card header */}
           <div className="flex items-center justify-between gap-2 px-4 pt-4 pb-3">
@@ -133,7 +133,7 @@ export default function IntakeBuilder({ questions, onChange }: Props) {
                 className={`py-2 px-3 text-xs font-medium border transition-all text-left rounded-md ${
                   q.type === t
                     ? 'bg-ink text-white border-ink'
-                    : 'bg-white text-secondary border-border hover:border-ink/40 hover:text-ink'
+                    : 'bg-card text-secondary border-border hover:border-ink/40 hover:text-ink'
                 }`}
               >
                 {TYPE_LABELS[t]}
