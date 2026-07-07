@@ -15,6 +15,8 @@ export default async function AvailabilityPage() {
       tenantId={tenant.id}
       resources={resources}
       sessionTypes={tenant.sessionTypes}
+      bookingMode={tenant.bookingMode}
+      generalAvailability={tenant.generalAvailability}
     />
   )
 }

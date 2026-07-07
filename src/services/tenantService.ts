@@ -1,5 +1,5 @@
 import { adminSupabase as supabase } from '@/lib/supabase/admin'
-import type { IntakeQuestion, PaymentMode, SessionTypePrices, Tenant, UpdateTenantInput } from '@/types'
+import type { BookingMode, IntakeQuestion, PaymentMode, SessionTypePrices, Tenant, UpdateTenantInput } from '@/types'
 
 function mapTenant(row: Record<string, unknown>): Tenant {
   const b = (row.branding ?? {}) as Record<string, string>
@@ -29,6 +29,10 @@ function mapTenant(row: Record<string, unknown>): Tenant {
     showPricesOnBookingPage: (row.show_prices_on_booking_page as boolean)      ?? false,
     googleConnected:         (row.google_calendar_connected   as boolean)      ?? false,
     googleConnectedEmail:    (row.google_connected_email      as string)       ?? undefined,
+    bookingMode:             ((row.booking_mode               as BookingMode)  ?? 'slotted'),
+    orlaBusinessContext:     (row.orla_business_context       as string)       ?? undefined,
+    orlaIntakePrompt:        (row.orla_intake_prompt          as string)       ?? undefined,
+    generalAvailability:     (row.general_availability        as string)       ?? undefined,
   }
 }
 
@@ -113,6 +117,18 @@ export const tenantService = {
     }
     if (input.onboardingCompleted !== undefined) {
       updates.onboarding_completed = input.onboardingCompleted
+    }
+    if (input.bookingMode !== undefined) {
+      updates.booking_mode = input.bookingMode
+    }
+    if (input.orlaBusinessContext !== undefined) {
+      updates.orla_business_context = input.orlaBusinessContext
+    }
+    if (input.orlaIntakePrompt !== undefined) {
+      updates.orla_intake_prompt = input.orlaIntakePrompt
+    }
+    if (input.generalAvailability !== undefined) {
+      updates.general_availability = input.generalAvailability
     }
 
     const { error } = await supabase.from('tenants').update(updates).eq('id', id)

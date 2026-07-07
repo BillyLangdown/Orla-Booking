@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, FormEvent } from 'react'
-import type { IntakeQuestion, Resource, Tenant } from '@/types'
+import type { BookingMode, IntakeQuestion, Resource, Tenant } from '@/types'
 import { updateTenantAction, saveIntakeQuestionsAction, createResourceAction, deleteResourceAction } from '@/app/actions'
 import Button from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -14,7 +14,7 @@ import GoogleConnect from './GoogleConnect'
 
 interface Props { tenant: Tenant; slotSessionTypes?: string[]; resources?: Resource[] }
 
-type View = 'menu' | 'business' | 'services' | 'booking' | 'questions' | 'payments' | 'integrations'
+type View = 'menu' | 'business' | 'services' | 'booking' | 'mode' | 'questions' | 'payments' | 'integrations'
 
 const inputClass = 'w-full bg-card border border-border px-3 py-3 text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/20 transition rounded-md'
 
@@ -151,7 +151,12 @@ export default function SettingsForm({ tenant, slotSessionTypes = [], resources:
   const [address, setAddress]         = useState(tenant.address)
   const [description, setDescription] = useState(tenant.description)
   const [logoUrl, setLogoUrl]         = useState(tenant.logoUrl ?? '')
-  const [autoConfirm, setAutoConfirm] = useState(tenant.autoConfirm)
+  const [autoConfirm, setAutoConfirm]       = useState(tenant.autoConfirm)
+  const [bookingMode, setBookingMode]       = useState<BookingMode>(tenant.bookingMode ?? 'slotted')
+  const [orlaContext, setOrlaContext]       = useState(tenant.orlaBusinessContext ?? '')
+  const [orlaPrompt, setOrlaPrompt]         = useState(tenant.orlaIntakePrompt ?? '')
+  const [savingMode, setSavingMode]         = useState(false)
+  const [savedMode, setSavedMode]           = useState(false)
   const [sessionTypes, setSessionTypes] = useState<string[]>(
     tenant.sessionTypes?.length ? tenant.sessionTypes : slotSessionTypes
   )
@@ -187,6 +192,32 @@ export default function SettingsForm({ tenant, slotSessionTypes = [], resources:
       setError(err instanceof Error ? err.message : 'Save failed')
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function handleSaveMode() {
+    setError(null)
+    if (bookingMode === 'open' && !orlaContext.trim()) {
+      setError('Please describe your business so Orla knows how to handle customer enquiries.')
+      return
+    }
+    setSavingMode(true); setSavedMode(false)
+    try {
+      await updateTenantAction(tenant.id, {
+        name, email, phone, address, description,
+        logoUrl: logoUrl || undefined,
+        primaryColor: tenant.branding.primaryColor,
+        accentColor:  tenant.branding.accentColor,
+        autoConfirm,
+        sessionTypes,
+        bookingMode,
+        orlaBusinessContext: orlaContext || undefined,
+        orlaIntakePrompt: orlaPrompt || undefined,
+      })
+      setSavedMode(true)
+      setTimeout(() => setSavedMode(false), 3000)
+    } finally {
+      setSavingMode(false)
     }
   }
 
@@ -234,6 +265,13 @@ export default function SettingsForm({ tenant, slotSessionTypes = [], resources:
         <MenuLabel title="Booking page" />
         <div className="flex flex-col gap-3">
           <MenuGroup><MenuRow label="Appearance" onClick={() => goTo('booking')} /></MenuGroup>
+          <MenuGroup>
+            <MenuRow
+              label="Booking mode"
+              value={bookingMode === 'open' ? 'Open enquiry' : 'Fixed slots'}
+              onClick={() => goTo('mode')}
+            />
+          </MenuGroup>
           <MenuGroup><MenuRow label="Intake questions" value={questionPreview} onClick={() => goTo('questions')} /></MenuGroup>
         </div>
 
@@ -413,6 +451,77 @@ export default function SettingsForm({ tenant, slotSessionTypes = [], resources:
 
         <SaveBar loading={saving} saved={saved} error={error} />
       </form>
+    )
+  }
+
+  // ── BOOKING MODE ──
+  if (view === 'mode') {
+    return (
+      <div key={slideKey} className={`flex flex-col gap-4 max-w-xl ${animClass}`}>
+        <SubHead title="Booking mode" onBack={() => goTo('menu')} />
+
+        <SettingCard>
+          <p className="text-sm font-medium text-ink">How do customers book?</p>
+          <div className="grid grid-cols-2 gap-3">
+            {([ ['slotted', 'Fixed slots', 'Customers pick from your pre-set available times.'], ['open', 'Open enquiry', 'Customers chat with Orla AI to describe what they need. You review and confirm.'] ] as const).map(([mode, label, desc]) => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => setBookingMode(mode)}
+                className={`border-2 px-3 py-3 text-sm text-left transition-colors ${bookingMode === mode ? 'border-ink bg-subtle' : 'border-border hover:border-secondary'}`}
+              >
+                <p className="font-semibold text-ink">{label}</p>
+                <p className="text-xs text-secondary mt-0.5">{desc}</p>
+              </button>
+            ))}
+          </div>
+        </SettingCard>
+
+        {bookingMode === 'open' && (
+          <>
+            <SettingCard>
+              <div>
+                <p className="text-sm font-medium text-ink">About your business</p>
+                <p className="text-xs text-secondary mt-0.5">
+                  Required. Tell Orla what your business does, what services you offer, and your area. This is how she understands vague or industry-specific language from customers.
+                </p>
+              </div>
+              <textarea
+                value={orlaContext}
+                onChange={e => setOrlaContext(e.target.value)}
+                rows={5}
+                placeholder={`e.g. We are a residential plumbing company based in Bristol. We cover leak repairs, boiler servicing, bathroom installations, and blocked drains. We work across Bristol and within 15 miles. We do not cover commercial properties.`}
+                className={`${inputClass} resize-none`}
+              />
+              {!orlaContext.trim() && (
+                <p className="text-xs text-rose-500">This field is required for Open Enquiry mode.</p>
+              )}
+            </SettingCard>
+
+            <SettingCard>
+              <div>
+                <p className="text-sm font-medium text-ink">What Orla should collect</p>
+                <p className="text-xs text-secondary mt-0.5">
+                  Tell Orla what specific details to gather before submitting an enquiry.
+                </p>
+              </div>
+              <textarea
+                value={orlaPrompt}
+                onChange={e => setOrlaPrompt(e.target.value)}
+                rows={4}
+                placeholder="e.g. Ask for: type of issue, location in the property, how long it has been happening, whether it is an emergency. Always collect name, email, and phone number."
+                className={`${inputClass} resize-none`}
+              />
+            </SettingCard>
+          </>
+        )}
+
+        <div className="flex items-center gap-3 pt-1">
+          <Button type="button" onClick={handleSaveMode} loading={savingMode}>Save</Button>
+          {savedMode && <span className="text-sm text-accent font-medium">Saved</span>}
+          {error  && <span className="text-sm text-rose-600">{error}</span>}
+        </div>
+      </div>
     )
   }
 

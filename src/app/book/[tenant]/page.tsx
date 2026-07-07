@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { tenantService } from '@/services/tenantService'
 import { availabilityService } from '@/services/availabilityService'
 import BookingPageClient from '@/components/booking/BookingPageClient'
+import OpenBookChat from '@/components/booking/OpenBookChat'
 
 interface Props {
   params: Promise<{ tenant: string }>
@@ -23,6 +24,10 @@ export default async function BookingPage({ params }: Props) {
 
   const tenant = await tenantService.getTenantBySlug(slug)
   if (!tenant) notFound()
+
+  if (tenant.bookingMode === 'open') {
+    return <OpenBookChat tenant={tenant} />
+  }
 
   const allSlots = await availabilityService.getSlots(tenant.id)
   const configuredTypes = tenant.sessionTypes ?? []

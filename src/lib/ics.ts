@@ -85,6 +85,48 @@ export function addToCalendarUrl(appUrl: string, opts: {
   return `${appUrl}/calendar?${p}`
 }
 
+export interface FeedEvent {
+  uid: string
+  summary: string
+  description: string
+  dtStart: string  // pre-formatted: YYYYMMDDTHHMMSSZ (UTC) or YYYYMMDDTHHMMSS (floating)
+  dtEnd: string
+  status: 'CONFIRMED' | 'TENTATIVE'
+}
+
+export function generateCalendarFeed(calName: string, events: FeedEvent[]): string {
+  const now = dtFmt(new Date().toISOString())
+
+  const vevents = events.map(e => {
+    const lines = [
+      'BEGIN:VEVENT',
+      `UID:${e.uid}@orla`,
+      `DTSTAMP:${now}`,
+      `DTSTART:${e.dtStart}`,
+      `DTEND:${e.dtEnd}`,
+      `SUMMARY:${escapeText(e.summary)}`,
+      `DESCRIPTION:${escapeText(e.description)}`,
+      `STATUS:${e.status}`,
+      'END:VEVENT',
+    ]
+    return lines.map(foldLine).join('\r\n')
+  })
+
+  return [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Orla//Booking Calendar//EN',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    foldLine(`X-WR-CALNAME:${escapeText(calName)}`),
+    'X-WR-CALDESC:Bookings via Orla',
+    'REFRESH-INTERVAL;VALUE=DURATION:PT1H',
+    'X-PUBLISHED-TTL:PT1H',
+    ...vevents,
+    'END:VCALENDAR',
+  ].join('\r\n')
+}
+
 export function googleCalendarUrl(opts: {
   summary: string
   description: string

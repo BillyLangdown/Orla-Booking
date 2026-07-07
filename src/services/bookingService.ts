@@ -40,6 +40,9 @@ function mapBooking(row: Record<string, unknown>): Booking {
     paymentAuthorizedAt:   (row.payment_authorized_at as string) ?? undefined,
     amountPaid:            (row.amount_paid as number) ?? undefined,
     googleEventId:         (row.google_event_id as string) ?? undefined,
+    proposedDate:          (row.proposed_date   as string) ?? undefined,
+    proposedTime:          (row.proposed_time   as string) ?? undefined,
+    chatSummary:           (row.chat_summary    as string) ?? undefined,
   }
 }
 
@@ -83,6 +86,29 @@ export const bookingService = {
       .single()
 
     if (error || !data) return null
+    return mapBooking(data as Record<string, unknown>)
+  },
+
+  async createOpenEnquiry(input: Pick<CreateBookingInput, 'tenantId' | 'name' | 'email' | 'phone' | 'notes' | 'sessionType' | 'intakeAnswers' | 'proposedDate' | 'proposedTime' | 'chatSummary'>): Promise<Booking> {
+    const { data, error } = await supabase
+      .from('bookings')
+      .insert({
+        tenant_id:      input.tenantId,
+        customer_name:  input.name,
+        customer_email: input.email,
+        customer_phone: input.phone ?? null,
+        notes:          input.notes ?? null,
+        session_type:   input.sessionType,
+        intake_answers: input.intakeAnswers,
+        status:         'pending',
+        proposed_date:  input.proposedDate ?? null,
+        proposed_time:  input.proposedTime ?? null,
+        chat_summary:   input.chatSummary ?? null,
+      })
+      .select()
+      .single()
+
+    if (error || !data) throw new Error(error?.message ?? 'Failed to create enquiry')
     return mapBooking(data as Record<string, unknown>)
   },
 

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import type { IntakeQuestion, Tenant } from '@/types'
+import type { BookingMode, IntakeQuestion, Tenant } from '@/types'
 import { updateTenantAction, saveIntakeQuestionsAction, completeOnboardingAction, setPasswordAction, createResourceAction, createSlotsAction } from '@/app/actions'
 import { generateRecurringDates } from './SlotCreateForm'
 import type { CreateSlotInput } from '@/types'
@@ -29,8 +29,8 @@ interface WizSlotPattern {
   locationName: string
 }
 
-const STEPS = ['Password', 'Business', 'Services', 'Branding', 'Resources', 'Availability', 'Questions', 'Done'] as const
-const OPTIONAL_STEPS = new Set([2, 3, 4, 5, 6])
+const STEPS = ['Password', 'Business', 'Booking', 'Services', 'Branding', 'Resources', 'Availability', 'Questions', 'Calendar', 'Done'] as const
+const OPTIONAL_STEPS = new Set([3, 4, 5, 6, 7, 8])
 
 const EXAMPLE_QUESTIONS: IntakeQuestion[] = [
   { id: 'ex1', type: 'dropdown', label: 'Experience level', required: true, options: ['Beginner', 'Intermediate', 'Advanced', 'Professional'] },
@@ -138,6 +138,10 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
   const [confirm, setConfirm]   = useState('')
   const [showPwd, setShowPwd]   = useState(false)
 
+  // Booking mode step
+  const [bookingMode, setBookingMode]       = useState<BookingMode>(tenant.bookingMode ?? 'slotted')
+  const [orlaContext, setOrlaContext]        = useState(tenant.orlaBusinessContext ?? '')
+
   // Business step
   const [name, setName]        = useState(tenant.name)
   const [email, setEmail]      = useState(tenant.email || userEmail)
@@ -225,6 +229,9 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
   const [questions, setQuestions]     = useState<IntakeQuestion[]>([])
   const [useExamples, setUseExamples] = useState(false)
 
+  // Calendar step
+  const [calLinkCopied, setCalLinkCopied] = useState(false)
+
   const rules = passwordRules(password)
   const allRulesMet = Object.values(rules).every(Boolean)
 
@@ -232,6 +239,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
     setError(null)
 
     if (step === 0) {
+      // Password
       if (!allRulesMet) { setError('Password does not meet all requirements.'); return }
       if (password !== confirm) { setError('Passwords do not match.'); return }
       setSaving(true)
@@ -241,6 +249,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
       setStep(1)
 
     } else if (step === 1) {
+      // Business
       setSaving(true)
       await updateTenantAction(tenant.id, {
         name, description,
@@ -252,6 +261,25 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
       setStep(2)
 
     } else if (step === 2) {
+      // Booking mode
+      if (bookingMode === 'open' && !orlaContext.trim()) {
+        setError('Please describe your business so Orla knows how to handle customer enquiries.')
+        return
+      }
+      setSaving(true)
+      await updateTenantAction(tenant.id, {
+        name, description,
+        email, phone: tenant.phone, address: tenant.address,
+        primaryColor: tenant.branding.primaryColor,
+        accentColor:  tenant.branding.accentColor,
+        bookingMode,
+        orlaBusinessContext: orlaContext || undefined,
+      })
+      setSaving(false)
+      setStep(3)
+
+    } else if (step === 3) {
+      // Services
       setSaving(true)
       await updateTenantAction(tenant.id, {
         name, description,
@@ -259,11 +287,13 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
         primaryColor: tenant.branding.primaryColor,
         accentColor:  tenant.branding.accentColor,
         sessionTypes,
+        bookingMode,
       })
       setSaving(false)
-      setStep(3)
+      setStep(4)
 
-    } else if (step === 3) {
+    } else if (step === 4) {
+      // Branding
       setSaving(true)
       await updateTenantAction(tenant.id, {
         name, description,
@@ -272,15 +302,18 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
         primaryColor: tenant.branding.primaryColor,
         accentColor:  tenant.branding.accentColor,
         sessionTypes,
+        bookingMode,
       })
       setSaving(false)
-      setStep(4)
-
-    } else if (step === 4) {
-      // Resources step - just advance, no saving yet
-      setStep(5)
+      // Skip Resources + Availability for open-book tenants
+      setStep(bookingMode === 'open' ? 7 : 5)
 
     } else if (step === 5) {
+      // Resources - just advance
+      setStep(6)
+
+    } else if (step === 6) {
+      // Availability
       setEditingId(null)
       setSaving(true)
       const allCreated: Array<{ name: string; id: string; type: string }> = []
@@ -332,16 +365,22 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
         if (r.error) { setError(r.error); setSaving(false); return }
       }
       setSaving(false)
-      setStep(6)
+      setStep(7)
 
-    } else if (step === 6) {
+    } else if (step === 7) {
+      // Questions
       setSaving(true)
       const finalQ = useExamples ? EXAMPLE_QUESTIONS : questions
       await saveIntakeQuestionsAction(tenant.id, finalQ)
       setSaving(false)
-      setStep(7)
+      setStep(8)
+
+    } else if (step === 8) {
+      // Calendar — optional, nothing to save
+      setStep(9)
 
     } else {
+      // Done
       await completeOnboardingAction(tenant.id)
       router.push('/dashboard/bookings')
     }
@@ -454,8 +493,61 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
           </>
         )}
 
-        {/* Step 2 - Services */}
+        {/* Step 2 - Booking mode */}
         {step === 2 && (
+          <>
+            <div>
+              <h1 className="text-2xl font-bold text-ink">How do customers book?</h1>
+              <p className="text-sm text-secondary mt-1">
+                Choose how customers will make a booking with you. You can change this later in Settings.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-3">
+              {([
+                ['slotted', 'Fixed time slots', 'Customers choose from times you set in advance. Best for classes, lessons, and appointments.'],
+                ['open', 'Open enquiry', 'Customers chat with Orla to describe what they need. You review and confirm. Best for project-based or custom work.'],
+              ] as const).map(([mode, label, desc]) => (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => setBookingMode(mode)}
+                  className={`bg-white shadow-sm border-2 px-5 py-4 text-left transition-colors ${bookingMode === mode ? 'border-ink' : 'border-transparent hover:border-border'}`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`mt-0.5 h-4 w-4 rounded-full border-2 flex items-center justify-center shrink-0 ${bookingMode === mode ? 'border-ink' : 'border-border'}`}>
+                      {bookingMode === mode && <div className="h-2 w-2 rounded-full bg-ink" />}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-ink">{label}</p>
+                      <p className="text-xs text-secondary mt-0.5">{desc}</p>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {bookingMode === 'open' && (
+              <div className="bg-white shadow-sm p-5 flex flex-col gap-3">
+                <div>
+                  <label className="text-sm font-semibold text-ink">About your business</label>
+                  <p className="text-xs text-secondary mt-0.5">
+                    Tell Orla what your business does, what services you offer, and your area. This lets her understand what customers are describing. Required.
+                  </p>
+                </div>
+                <textarea
+                  value={orlaContext}
+                  onChange={e => setOrlaContext(e.target.value)}
+                  rows={5}
+                  placeholder={`e.g. We are a residential plumbing company based in Bristol. We cover leak repairs, boiler servicing, bathroom installations, and blocked drains. We work across Bristol and within 15 miles. We do not cover commercial properties.`}
+                  className={`${inputClass} resize-none`}
+                />
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Step 3 - Services (was 2) */}
+        {step === 3 && (
           <>
             <div>
               <h1 className="text-2xl font-bold text-ink">Your services</h1>
@@ -470,8 +562,8 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
           </>
         )}
 
-        {/* Step 3 - Branding */}
-        {step === 3 && (
+        {/* Step 4 - Branding (was 3) */}
+        {step === 4 && (
           <>
             <div>
               <h1 className="text-2xl font-bold text-ink">Add your logo</h1>
@@ -484,8 +576,8 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
           </>
         )}
 
-        {/* Step 4 - Resources */}
-        {step === 4 && (
+        {/* Step 5 - Resources (was 4) */}
+        {step === 5 && (
           <>
             <div>
               <h1 className="text-2xl font-bold text-ink">What are customers booking?</h1>
@@ -527,8 +619,8 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
           </>
         )}
 
-        {/* Step 5 - Availability */}
-        {step === 5 && (
+        {/* Step 6 - Availability (was 5) */}
+        {step === 6 && (
           <>
             <div>
               <h1 className="text-2xl font-bold text-ink">Working hours</h1>
@@ -715,8 +807,8 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
           </>
         )}
 
-        {/* Step 6 - Questions */}
-        {step === 6 && (
+        {/* Step 7 - Questions (was 6) */}
+        {step === 7 && (
           <>
             <div>
               <h1 className="text-2xl font-bold text-ink">Booking questions</h1>
@@ -760,8 +852,108 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
           </>
         )}
 
-        {/* Step 7 - Done */}
-        {step === 7 && (
+        {/* Step 8 - Calendar */}
+        {step === 8 && (() => {
+          const icalUrl = typeof window !== 'undefined'
+            ? `${window.location.origin}/api/cal/${tenant.slug}`
+            : `/api/cal/${tenant.slug}`
+          const connectGoogleUrl = `/api/auth/google?tenant_id=${tenant.id}&return_to=${encodeURIComponent('/setup?step=8')}`
+          return (
+            <>
+              <div>
+                <h1 className="text-2xl font-bold text-ink">Connect your calendar</h1>
+                <p className="text-sm text-secondary mt-1">
+                  Keep your bookings in sync with the calendar app you already use. Both are optional.
+                </p>
+              </div>
+
+              {/* Google Calendar */}
+              <div className="bg-white shadow-sm p-5 flex flex-col gap-3">
+                <div className="flex items-start gap-3">
+                  <svg viewBox="0 0 48 48" className="w-8 h-8 shrink-0 mt-0.5" aria-hidden="true">
+                    <rect fill="#fff" x="6" y="6" width="36" height="36" rx="3"/>
+                    <path fill="#1a73e8" d="M33 6H15A9 9 0 0 0 6 15v18a9 9 0 0 0 9 9h18a9 9 0 0 0 9-9V15a9 9 0 0 0-9-9z"/>
+                    <rect fill="#fff" x="10" y="10" width="28" height="28" rx="2"/>
+                    <path fill="#1a73e8" d="M24 22.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7z"/>
+                    <path fill="#ea4335" d="M24 12v4"/>
+                    <path fill="#34a853" d="M36 24h-4"/>
+                    <path fill="#fbbc04" d="M24 36v-4"/>
+                    <path fill="#ea4335" d="M12 24h4"/>
+                  </svg>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-ink">Google Calendar</p>
+                    <p className="text-xs text-secondary mt-0.5">
+                      When you confirm a booking, it appears in your Google Calendar automatically.
+                    </p>
+                  </div>
+                </div>
+                {tenant.googleConnected ? (
+                  <div className="flex items-center gap-2 px-3 py-2.5 bg-emerald-50 border border-emerald-100">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="shrink-0">
+                      <path d="M2.5 7l3 3 6-6" stroke="#16a34a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    <span className="text-xs text-emerald-700 font-medium">
+                      Connected{tenant.googleConnectedEmail ? ` · ${tenant.googleConnectedEmail}` : ''}
+                    </span>
+                  </div>
+                ) : (
+                  <a
+                    href={connectGoogleUrl}
+                    className="flex items-center justify-center gap-2 w-full bg-ink text-white px-3 py-2.5 text-sm font-medium hover:bg-ink/85 transition-colors"
+                  >
+                    Connect Google Calendar
+                  </a>
+                )}
+              </div>
+
+              {/* iCal / Apple Calendar */}
+              <div className="bg-white shadow-sm p-5 flex flex-col gap-3">
+                <div className="flex items-start gap-3">
+                  <svg viewBox="0 0 48 48" className="w-8 h-8 shrink-0 mt-0.5" aria-hidden="true">
+                    <rect fill="#fff" x="4" y="4" width="40" height="40" rx="8"/>
+                    <rect fill="#f97316" x="4" y="4" width="40" height="12" rx="8"/>
+                    <rect fill="#f97316" x="4" y="10" width="40" height="6"/>
+                    <rect fill="#fff" x="4" y="10" width="40" height="34" rx="0"/>
+                    <rect fill="#fff" x="4" y="10" width="40" height="34" rx="8"/>
+                    <path fill="#1e293b" d="M15 26h4v4h-4zm7 0h4v4h-4zm7 0h4v4h-4zm-14 7h4v4h-4zm7 0h4v4h-4z"/>
+                  </svg>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-ink">Apple Calendar, Outlook, and others</p>
+                    <p className="text-xs text-secondary mt-0.5">
+                      Subscribe to your booking feed. Any calendar app that supports iCal can use this link.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={icalUrl}
+                    className="flex-1 border border-border bg-subtle px-3 py-2 text-xs font-mono text-secondary focus:outline-none"
+                    onFocus={e => e.target.select()}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void navigator.clipboard.writeText(icalUrl)
+                      setCalLinkCopied(true)
+                      setTimeout(() => setCalLinkCopied(false), 2000)
+                    }}
+                    className="shrink-0 px-3 py-2 bg-ink text-white text-xs font-medium hover:bg-ink/85 transition-colors"
+                  >
+                    {calLinkCopied ? 'Copied' : 'Copy'}
+                  </button>
+                </div>
+                <p className="text-xs text-muted">
+                  In Apple Calendar: File &gt; New Calendar Subscription and paste this link. In Outlook: Add calendar &gt; From internet.
+                </p>
+              </div>
+            </>
+          )
+        })()}
+
+        {/* Step 9 - Done */}
+        {step === 9 && (
           <div className="flex flex-col items-center text-center gap-6 py-8">
             <div className="flex h-14 w-14 items-center justify-center bg-emerald-100">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -797,17 +989,22 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
       {/* Footer nav */}
       <div className="bg-white border-t border-border px-4 py-4 sticky bottom-0">
         <div className="mx-auto max-w-xl flex items-center justify-between">
-          {step > 0 && step < 7 ? (
+          {step > 0 && step < 9 ? (
             <button
               type="button"
-              onClick={() => { setError(null); setStep(step - 1) }}
+              onClick={() => {
+                setError(null)
+                // Open-book skips Resources (5) and Availability (6); skip them on back too
+                if (step === 7 && bookingMode === 'open') { setStep(4) }
+                else { setStep(step - 1) }
+              }}
               className="text-sm text-secondary hover:text-ink transition-colors"
             >
               ← Back
             </button>
           ) : <div />}
           <Button onClick={handleNext} loading={saving}>
-            {step === 7 ? 'Go to dashboard' : step === 6 ? 'Save & finish' : 'Continue →'}
+            {step === 9 ? 'Go to dashboard' : step === 7 ? 'Save & finish' : 'Continue →'}
           </Button>
         </div>
       </div>

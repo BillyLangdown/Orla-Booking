@@ -8,6 +8,8 @@ export type BookingStatus = 'confirmed' | 'pending' | 'cancelled' | 'awaiting_pa
 
 export type PaymentMode = 'none' | 'full' | 'deposit'
 
+export type BookingMode = 'slotted' | 'open'
+
 export interface SessionTypePrice {
   price:         number
   depositAmount: number
@@ -49,6 +51,10 @@ export interface Tenant {
   showPricesOnBookingPage: boolean
   googleConnected: boolean
   googleConnectedEmail?: string
+  bookingMode: BookingMode
+  orlaBusinessContext?: string
+  orlaIntakePrompt?: string
+  generalAvailability?: string
 }
 
 export interface Resource {
@@ -77,7 +83,7 @@ export interface AvailabilitySlot {
 export interface Booking {
   id: string
   tenantId: TenantId
-  slotId: string
+  slotId?: string
   slot?: Pick<AvailabilitySlot, 'date' | 'startTime' | 'endTime' | 'sessionType'>
   name: string
   email: string
@@ -94,6 +100,10 @@ export interface Booking {
   paymentAuthorizedAt?: string
   amountPaid?: number
   googleEventId?: string
+  // Open-book fields
+  proposedDate?: string
+  proposedTime?: string
+  chatSummary?: string
 }
 
 export interface CreateSlotInput {
@@ -123,19 +133,27 @@ export interface UpdateTenantInput {
   sessionTypes?: string[]
   primaryColor: string
   accentColor: string
+  bookingMode?: BookingMode
+  orlaBusinessContext?: string
+  orlaIntakePrompt?: string
+  generalAvailability?: string
 }
 
 export interface CreateBookingInput {
   tenantId: TenantId
-  slotId: string
-  resourceId: string
+  slotId?: string
+  resourceId?: string
   name: string
   email: string
   phone?: string
   notes?: string
   sessionType: SessionType
   intakeAnswers: Record<string, string>
-  startTime: string
-  endTime: string
+  startTime?: string
+  endTime?: string
   status?: BookingStatus
+  // Open-book fields
+  proposedDate?: string
+  proposedTime?: string
+  chatSummary?: string
 }

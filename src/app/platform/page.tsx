@@ -15,13 +15,13 @@ export default async function SuperAdminPage() {
         </div>
         <Link
           href="/platform/new"
-          className="inline-flex items-center gap-1.5 bg-ink text-white px-3 py-1.5 text-sm font-medium hover:bg-ink/80 transition-colors"
+          className="inline-flex items-center gap-1.5 bg-accent text-white px-3 py-1.5 text-sm font-medium hover:bg-accent-hover transition-colors"
         >
           + Add business
         </Link>
       </div>
 
-      <div className="bg-white shadow-sm">
+      <div className="bg-card border border-border/40 rounded-xl overflow-hidden">
         {tenants.length === 0 ? (
           <div className="py-16 text-center">
             <p className="text-sm text-secondary">No businesses yet.</p>
@@ -33,7 +33,7 @@ export default async function SuperAdminPage() {
           <ul className="divide-y divide-border/50">
             {tenants.map((t) => (
               <li key={t.id} className="flex items-center gap-4 px-5 py-4">
-                <div className="flex h-9 w-9 items-center justify-center bg-ink/10 text-ink text-sm font-bold shrink-0">
+                <div className="flex h-9 w-9 items-center justify-center bg-white/10 text-white text-sm font-bold shrink-0 rounded-md">
                   {t.name.charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -51,7 +51,7 @@ export default async function SuperAdminPage() {
                   </a>
                   <Link
                     href={`/platform/${t.id}`}
-                    className="px-3 py-1.5 text-xs font-medium bg-ink text-white hover:bg-ink/80 transition-colors"
+                    className="px-3 py-1.5 text-xs font-medium bg-accent text-white hover:bg-accent-hover transition-colors rounded-md"
                   >
                     Manage
                   </Link>

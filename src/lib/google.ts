@@ -14,7 +14,9 @@ const SCOPES = [
   'https://www.googleapis.com/auth/gmail.send',
 ].join(' ')
 
-export function getGoogleAuthUrl(tenantId: string, redirectUri: string): string {
+export function getGoogleAuthUrl(tenantId: string, redirectUri: string, returnTo?: string): string {
+  // state encodes tenantId and optional return path, pipe-separated
+  const state = returnTo ? `${tenantId}|${encodeURIComponent(returnTo)}` : tenantId
   const params = new URLSearchParams({
     client_id:     CLIENT_ID,
     redirect_uri:  redirectUri,
@@ -22,7 +24,7 @@ export function getGoogleAuthUrl(tenantId: string, redirectUri: string): string 
     access_type:   'offline',
     prompt:        'consent',
     scope:         SCOPES,
-    state:         tenantId,
+    state,
   })
   return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`
 }
@@ -170,6 +172,37 @@ export async function createCalendarEvent(
   if (event.id) {
     await adminSupabase.from('bookings').update({ google_event_id: event.id }).eq('id', booking.id)
   }
+}
+
+interface FreeBusyPeriod {
+  start: string
+  end: string
+}
+
+interface FreeBusyResponse {
+  calendars?: Record<string, { busy?: FreeBusyPeriod[] }>
+}
+
+export async function getGoogleFreeBusy(
+  tenantId: string,
+  timeMin: string,
+  timeMax: string,
+): Promise<FreeBusyPeriod[]> {
+  const accessToken = await getValidAccessToken(tenantId)
+  if (!accessToken) return []
+
+  const res = await fetch('https://www.googleapis.com/calendar/v3/freeBusy', {
+    method:  'POST',
+    headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ timeMin, timeMax, items: [{ id: 'primary' }] }),
+  })
+  if (!res.ok) {
+    console.error('[google-freeBusy] request failed:', await res.text())
+    return []
+  }
+
+  const data = (await res.json()) as FreeBusyResponse
+  return data.calendars?.primary?.busy ?? []
 }
 
 export async function deleteCalendarEvent(tenantId: string, googleEventId: string): Promise<void> {

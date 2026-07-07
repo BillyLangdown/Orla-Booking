@@ -72,14 +72,14 @@ export async function createBookingAction(
         appUrl,
         captureMethod:    'manual',
         pendingBooking: {
-          slotId:       input.slotId,
-          resourceId:   input.resourceId,
+          slotId:       input.slotId!,
+          resourceId:   input.resourceId!,
           name:         input.name,
           email:        input.email,
           phone:        input.phone ?? '',
           sessionType:  input.sessionType,
-          startTime:    input.startTime,
-          endTime:      input.endTime,
+          startTime:    input.startTime!,
+          endTime:      input.endTime!,
           intakeAnswers: input.intakeAnswers,
         },
       })
@@ -125,10 +125,10 @@ export async function createBookingAction(
     }
 
     if (tenant && autoConfirm) {
-      await sendBookingConfirmation(booking, input.startTime, input.endTime, tenant)
+      await sendBookingConfirmation(booking, input.startTime!, input.endTime!, tenant)
       if (tenant.googleConnected) {
         try {
-          await createCalendarEvent(tenant.id, booking, input.startTime, input.endTime)
+          await createCalendarEvent(tenant.id, booking, input.startTime!, input.endTime!)
         } catch {
           // calendar sync failures are non-fatal
         }
@@ -358,4 +358,52 @@ export async function setPasswordAction(password: string): Promise<{ error?: str
   const { error } = await supabase.auth.updateUser({ password })
   if (error) return { error: error.message }
   return {}
+}
+
+export async function saveGeneralAvailabilityAction(
+  tenantId: string,
+  generalAvailability: string,
+): Promise<{ error?: string }> {
+  try {
+    const { error } = await adminSupabase
+      .from('tenants')
+      .update({ general_availability: generalAvailability })
+      .eq('id', tenantId)
+    if (error) return { error: error.message }
+    revalidatePath('/dashboard/availability')
+    return {}
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : 'Save failed' }
+  }
+}
+
+export async function createOpenEnquiryAction(input: {
+  tenantId: string
+  name: string
+  email: string
+  phone?: string
+  notes?: string
+  sessionType: string
+  intakeAnswers: Record<string, string>
+  proposedDate?: string
+  proposedTime?: string
+  chatSummary?: string
+}): Promise<{ booking?: Booking; error?: string }> {
+  try {
+    const tenant = await tenantService.getTenantById(input.tenantId)
+    if (!tenant) return { error: 'Tenant not found' }
+
+    const booking = await bookingService.createOpenEnquiry(input)
+
+    await sendAdminNotification(booking, undefined, undefined, tenant)
+    void sendPushToTenant(booking.tenantId, {
+      title: 'New enquiry',
+      body: `${booking.name} sent an open enquiry${input.sessionType ? ` for ${input.sessionType}` : ''}`,
+      data: { bookingId: booking.id, type: 'new_booking' },
+    })
+
+    return { booking }
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : 'Failed to submit enquiry' }
+  }
 }

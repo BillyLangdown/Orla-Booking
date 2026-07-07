@@ -148,16 +148,17 @@ ${contactLines ? `Contact the business:\n${contactLines}` : ''}`
 
 export async function sendAdminNotification(
   booking: Booking,
-  startTime: string,
-  endTime: string,
+  startTime: string | undefined,
+  endTime: string | undefined,
   tenant: Tenant,
 ): Promise<void> {
   try {
     if (!resend) { console.warn('[email] sendAdminNotification skipped - no Resend client'); return }
     if (!tenant.email) { console.warn('[email] sendAdminNotification skipped - tenant has no email address'); return }
 
-    const start = formatISODate(startTime)
-    const end   = formatISODate(endTime)
+    const isOpenBook = !startTime
+    const start = startTime ? formatISODate(startTime) : null
+    const end   = endTime   ? formatISODate(endTime)   : null
     const accentColor = tenant.branding?.accentColor ?? '#0f172a'
     const appUrl = process.env.NEXT_PUBLIC_APP_URL
       ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
@@ -202,11 +203,11 @@ export async function sendAdminNotification(
   <div style="max-width:520px;margin:0 auto;background:#ffffff;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;">
     <div style="background:${accentColor};padding:24px 28px;">
       <p style="margin:0;font-size:22px;font-weight:700;color:#ffffff;">${tenant.name}</p>
-      <p style="margin:4px 0 0;font-size:14px;color:rgba(255,255,255,0.8);">${isPending ? 'New booking request' : 'New booking received'}</p>
+      <p style="margin:4px 0 0;font-size:14px;color:rgba(255,255,255,0.8);">${isOpenBook ? 'New open enquiry' : isPending ? 'New booking request' : 'New booking received'}</p>
     </div>
     <div style="padding:28px;">
-      <h1 style="margin:0 0 8px;font-size:20px;font-weight:600;">${isPending ? 'Booking request - ' : 'New booking - '}${booking.sessionType}</h1>
-      <p style="margin:0 0 24px;color:#64748b;font-size:15px;">${isPending ? 'A customer is requesting a session. Confirm or deny below.' : 'A customer has just booked a session.'}</p>
+      <h1 style="margin:0 0 8px;font-size:20px;font-weight:600;">${isOpenBook ? 'Open enquiry - ' : isPending ? 'Booking request - ' : 'New booking - '}${booking.sessionType}</h1>
+      <p style="margin:0 0 24px;color:#64748b;font-size:15px;">${isOpenBook ? 'A customer has submitted an open enquiry via Orla. Review and confirm or decline below.' : isPending ? 'A customer is requesting a session. Confirm or deny below.' : 'A customer has just booked a session.'}</p>
 
       <table style="width:100%;border-collapse:collapse;font-size:14px;">
         <tr style="border-bottom:1px solid #e2e8f0;">
@@ -226,14 +227,19 @@ export async function sendAdminNotification(
           <td style="padding:10px 0;color:#64748b;">Session type</td>
           <td style="padding:10px 0;font-weight:500;">${booking.sessionType}</td>
         </tr>
+        ${start ? `
         <tr style="border-bottom:1px solid #e2e8f0;">
           <td style="padding:10px 0;color:#64748b;">Date</td>
           <td style="padding:10px 0;font-weight:500;">${start.date}</td>
         </tr>
         <tr style="border-bottom:1px solid #e2e8f0;">
           <td style="padding:10px 0;color:#64748b;">Time</td>
-          <td style="padding:10px 0;font-weight:500;">${start.time} – ${end.time}</td>
-        </tr>
+          <td style="padding:10px 0;font-weight:500;">${start.time}${end ? ` – ${end.time}` : ''}</td>
+        </tr>` : booking.proposedDate ? `
+        <tr style="border-bottom:1px solid #e2e8f0;">
+          <td style="padding:10px 0;color:#64748b;">Proposed date</td>
+          <td style="padding:10px 0;font-weight:500;">${booking.proposedDate}${booking.proposedTime ? ` at ${booking.proposedTime}` : ''}</td>
+        </tr>` : ''}
         <tr style="border-bottom:1px solid #e2e8f0;">
           <td style="padding:10px 0;color:#64748b;">Status</td>
           <td style="padding:10px 0;">${statusBadge}</td>
@@ -251,28 +257,37 @@ export async function sendAdminNotification(
         <p style="margin:0;">${booking.notes}</p>
       </div>` : ''}
 
+      ${booking.chatSummary ? `
+      <div style="margin-top:24px;padding:16px;background:#f0f9ff;border-radius:8px;border-left:3px solid #0ea5e9;font-size:13px;color:#0f172a;">
+        <p style="margin:0 0 4px;font-weight:600;">Enquiry summary (from Orla)</p>
+        <p style="margin:0;white-space:pre-line;">${booking.chatSummary}</p>
+      </div>` : ''}
+
       ${actionButtons}
     </div>
   </div>
 </body>
 </html>`
 
-    const text = `${isPending ? 'Booking request' : 'New booking'} - ${booking.sessionType}
+    const text = `${isOpenBook ? 'Open enquiry' : isPending ? 'Booking request' : 'New booking'} - ${booking.sessionType}
 
 Customer: ${booking.name}
 Email: ${booking.email}
 ${booking.phone ? `Phone: ${booking.phone}\n` : ''}Session type: ${booking.sessionType}
-Date: ${start.date}
-Time: ${start.time} – ${end.time}
-Status: ${isPending ? 'Pending review' : 'Confirmed'}
+${start ? `Date: ${start.date}\nTime: ${start.time}${end ? ` – ${end.time}` : ''}` : booking.proposedDate ? `Proposed date: ${booking.proposedDate}${booking.proposedTime ? ` at ${booking.proposedTime}` : ''}` : ''}
+Status: Pending review
 Booking ref: ${booking.id}
 ${booking.notes ? `\nNotes: ${booking.notes}` : ''}
-${isPending ? `\nConfirm: ${appUrl}/api/booking/${booking.id}/confirm\nDeny: ${appUrl}/api/booking/${booking.id}/deny` : ''}`
+${booking.chatSummary ? `\nEnquiry summary:\n${booking.chatSummary}` : ''}
+Confirm: ${appUrl}/api/booking/${booking.id}/confirm
+Deny: ${appUrl}/api/booking/${booking.id}/deny`
 
     const { data, error } = await resend.emails.send({
       from: FROM,
       to: tenant.email,
-      subject: isPending
+      subject: isOpenBook
+        ? `Open enquiry - ${booking.name}${booking.sessionType ? ` (${booking.sessionType})` : ''}`
+        : isPending
         ? `Booking request - ${booking.name}${booking.sessionType ? ` (${booking.sessionType})` : ''}`
         : `New booking - ${booking.name}${booking.sessionType ? ` (${booking.sessionType})` : ''}`,
       html,
