@@ -75,7 +75,7 @@ function ResourceSection({
   onRemove: (i: number) => void
 }) {
   return (
-    <div className="bg-white shadow-sm p-5 flex flex-col gap-4">
+    <div className="bg-card shadow-sm p-5 flex flex-col gap-4">
       <div>
         <p className="text-sm font-semibold text-ink">{label}</p>
         <p className="text-xs text-secondary mt-0.5">{sublabel}</p>
@@ -87,7 +87,7 @@ function ResourceSection({
           onChange={(e) => onInputChange(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), onAdd())}
           placeholder={placeholder}
-          className="flex-1 border border-border bg-white px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/30 transition"
+          className="flex-1 border border-border bg-card px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/30 transition"
         />
         <button
           type="button"
@@ -119,8 +119,8 @@ function ResourceSection({
   )
 }
 
-const inputClass = 'w-full border border-border bg-white px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/30 transition'
-const selectClass = 'w-full border border-border bg-white px-3 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-accent/30 transition'
+const inputClass = 'w-full border border-border bg-card px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/30 transition'
+const selectClass = 'w-full border border-border bg-card px-3 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-accent/30 transition'
 
 export default function SetupWizard({ tenant, userEmail = '' }: Props) {
   const router   = useRouter()
@@ -421,7 +421,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
               <h1 className="text-2xl font-bold text-ink">Set your password</h1>
               <p className="text-sm text-secondary mt-1">You'll use this to log in to your booking dashboard.</p>
             </div>
-            <div className="bg-white shadow-sm p-5 flex flex-col gap-4">
+            <div className="bg-card shadow-sm p-5 flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium text-ink">New password</label>
                 <div className="relative">
@@ -470,7 +470,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
               <h1 className="text-2xl font-bold text-ink">Your business</h1>
               <p className="text-sm text-secondary mt-1">This appears on your public booking page.</p>
             </div>
-            <div className="bg-white shadow-sm p-5 flex flex-col gap-4">
+            <div className="bg-card shadow-sm p-5 flex flex-col gap-4">
               <Input label="Business name" value={name} onChange={(e) => setName(e.target.value)} required />
               <Input
                 label="Contact email" type="email" value={email}
@@ -511,7 +511,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
                   key={mode}
                   type="button"
                   onClick={() => setBookingMode(mode)}
-                  className={`bg-white shadow-sm border-2 px-5 py-4 text-left transition-colors ${bookingMode === mode ? 'border-ink' : 'border-transparent hover:border-border'}`}
+                  className={`bg-card shadow-sm border-2 px-5 py-4 text-left transition-colors ${bookingMode === mode ? 'border-ink' : 'border-transparent hover:border-border'}`}
                 >
                   <div className="flex items-start gap-3">
                     <div className={`mt-0.5 h-4 w-4 rounded-full border-2 flex items-center justify-center shrink-0 ${bookingMode === mode ? 'border-ink' : 'border-border'}`}>
@@ -527,7 +527,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
             </div>
 
             {bookingMode === 'open' && (
-              <div className="bg-white shadow-sm p-5 flex flex-col gap-3">
+              <div className="bg-card shadow-sm p-5 flex flex-col gap-3">
                 <div>
                   <label className="text-sm font-semibold text-ink">About your business</label>
                   <p className="text-xs text-secondary mt-0.5">
@@ -555,7 +555,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
                 Add the types of sessions or services customers can book. You can change these any time in Settings.
               </p>
             </div>
-            <div className="bg-white shadow-sm p-5 flex flex-col gap-3">
+            <div className="bg-card shadow-sm p-5 flex flex-col gap-3">
               <SessionTypeEditor types={sessionTypes} onChange={setSessionTypes} />
             </div>
             <p className="text-xs text-secondary text-center">You can skip this and add service types later in Settings.</p>
@@ -569,7 +569,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
               <h1 className="text-2xl font-bold text-ink">Add your logo</h1>
               <p className="text-sm text-secondary mt-1">Optional - shown at the top of your booking page.</p>
             </div>
-            <div className="bg-white shadow-sm p-5">
+            <div className="bg-card shadow-sm p-5">
               <LogoUpload currentUrl={logoUrl || undefined} onUpload={setLogoUrl} />
             </div>
             <p className="text-xs text-secondary text-center">You can skip this and add a logo later in Settings.</p>
@@ -627,7 +627,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
               <p className="text-sm text-secondary mt-1">Set your available times. Add as many blocks as you need, then continue.</p>
             </div>
 
-            <div className="bg-white shadow-sm flex flex-col overflow-hidden">
+            <div className="bg-card shadow-sm flex flex-col overflow-hidden">
               {editingId && (
                 <div className="flex items-center justify-between gap-3 px-5 py-3 bg-amber-50 border-b border-amber-200">
                   <div className="flex items-center gap-2">
@@ -648,7 +648,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
               <div className="flex border-b border-border">
                 {(['recurring', 'once'] as const).map((m) => (
                   <button key={m} type="button" onClick={() => { setAvailMode(m); setFormTouched(true) }}
-                    className={`flex-1 py-2.5 text-sm font-medium transition-colors ${availMode === m ? 'text-ink border-b-2 border-ink -mb-px bg-white' : 'text-secondary hover:text-ink'}`}
+                    className={`flex-1 py-2.5 text-sm font-medium transition-colors ${availMode === m ? 'text-ink border-b-2 border-ink -mb-px bg-card' : 'text-secondary hover:text-ink'}`}
                   >
                     {m === 'recurring' ? 'Recurring' : 'One-off'}
                   </button>
@@ -664,7 +664,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
                         {AVAIL_DAYS.map((d) => (
                           <button key={d.value} type="button"
                             onClick={() => { setAvailDays(p => p.includes(d.value) ? p.filter(x => x !== d.value) : [...p, d.value]); setFormTouched(true) }}
-                            className={`px-3 py-1.5 text-xs font-medium border transition-colors ${availDays.includes(d.value) ? 'bg-ink text-white border-ink' : 'bg-white text-secondary border-border hover:border-ink/30'}`}
+                            className={`px-3 py-1.5 text-xs font-medium border transition-colors ${availDays.includes(d.value) ? 'bg-ink text-white border-ink' : 'bg-card text-secondary border-border hover:border-ink/30'}`}
                           >
                             {d.label}
                           </button>
@@ -760,7 +760,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
             </div>
 
             {patterns.length > 0 && (
-              <div className="bg-white shadow-sm overflow-hidden">
+              <div className="bg-card shadow-sm overflow-hidden">
                 <div className="px-5 pt-4 pb-3 border-b border-border">
                   <p className="text-sm font-semibold text-ink">
                     Schedule ({patterns.length} block{patterns.length !== 1 ? 's' : ''})
@@ -816,7 +816,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
                 Customers answer these before confirming. Collect anything useful upfront.
               </p>
             </div>
-            <div className="bg-white shadow-sm p-5 flex flex-col gap-4">
+            <div className="bg-card shadow-sm p-5 flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
@@ -868,7 +868,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
               </div>
 
               {/* Google Calendar */}
-              <div className="bg-white shadow-sm p-5 flex flex-col gap-3">
+              <div className="bg-card shadow-sm p-5 flex flex-col gap-3">
                 <div className="flex items-start gap-3">
                   <svg viewBox="0 0 48 48" className="w-8 h-8 shrink-0 mt-0.5" aria-hidden="true">
                     <rect fill="#fff" x="6" y="6" width="36" height="36" rx="3"/>
@@ -907,7 +907,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
               </div>
 
               {/* iCal / Apple Calendar */}
-              <div className="bg-white shadow-sm p-5 flex flex-col gap-3">
+              <div className="bg-card shadow-sm p-5 flex flex-col gap-3">
                 <div className="flex items-start gap-3">
                   <svg viewBox="0 0 48 48" className="w-8 h-8 shrink-0 mt-0.5" aria-hidden="true">
                     <rect fill="#fff" x="4" y="4" width="40" height="40" rx="8"/>
@@ -966,7 +966,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
                 Your booking page is live. Share the link with your customers.
               </p>
             </div>
-            <div className="w-full bg-white shadow-sm p-4 text-left flex flex-col gap-3">
+            <div className="w-full bg-card shadow-sm p-4 text-left flex flex-col gap-3">
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-medium text-secondary">Your booking link</span>
                 <span className="font-mono text-sm text-accent break-all">
@@ -987,7 +987,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
       </div>
 
       {/* Footer nav */}
-      <div className="bg-white border-t border-border px-4 py-4 sticky bottom-0">
+      <div className="bg-card border-t border-border px-4 py-4 sticky bottom-0">
         <div className="mx-auto max-w-xl flex items-center justify-between">
           {step > 0 && step < 9 ? (
             <button
