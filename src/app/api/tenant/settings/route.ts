@@ -79,5 +79,6 @@ export async function POST(req: NextRequest) {
     general_availability:  updated.generalAvailability,
     orla_business_context: updated.orlaBusinessContext,
     orla_intake_prompt:    updated.orlaIntakePrompt,
+    ical_token:            updated.icalToken,
   })
 }

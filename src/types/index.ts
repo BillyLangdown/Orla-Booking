@@ -55,6 +55,7 @@ export interface Tenant {
   orlaBusinessContext?: string
   orlaIntakePrompt?: string
   generalAvailability?: string
+  icalToken: string
 }
 
 export interface Resource {

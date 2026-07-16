@@ -11,6 +11,7 @@ import SessionTypeEditor from './SessionTypeEditor'
 import BookingPageLink from './BookingPageLink'
 import PaymentSettings from './PaymentSettings'
 import GoogleConnect from './GoogleConnect'
+import CalendarFeedLink from './CalendarFeedLink'
 
 interface Props { tenant: Tenant; slotSessionTypes?: string[]; resources?: Resource[] }
 
@@ -393,7 +394,7 @@ export default function SettingsForm({ tenant, slotSessionTypes = [], resources:
                       type="button"
                       onClick={() => handleAddResource(type)}
                       disabled={resAdding === type || !resNames[type].trim()}
-                      className="shrink-0 bg-ink text-white px-4 py-2.5 text-sm font-medium rounded-md hover:bg-ink/85 transition-colors disabled:opacity-50"
+                      className="shrink-0 bg-accent text-white px-4 py-2.5 text-sm font-medium rounded-md hover:bg-accent-hover transition-colors disabled:opacity-50"
                     >
                       {resAdding === type ? 'Adding…' : 'Add'}
                     </button>
@@ -561,6 +562,7 @@ export default function SettingsForm({ tenant, slotSessionTypes = [], resources:
       <div key={slideKey} className={`flex flex-col gap-4 max-w-xl ${animClass}`}>
         <SubHead title="Integrations" onBack={() => goTo('menu')} />
         <GoogleConnect tenant={tenant} />
+        <CalendarFeedLink tenant={tenant} />
       </div>
     )
   }

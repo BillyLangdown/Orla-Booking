@@ -101,7 +101,7 @@ function page(title: string, message: string, success: boolean) {
         </a>
       </div>
     </div>
-    <p style="text-align:center;margin:20px 0 0;font-size:12px;color:#94a3b8;">Slick Booking</p>
+    <p style="text-align:center;margin:20px 0 0;font-size:12px;color:#94a3b8;">Orla Booking</p>
   </div>
 </body>
 </html>`

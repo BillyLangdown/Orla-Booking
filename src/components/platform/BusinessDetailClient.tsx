@@ -88,7 +88,7 @@ export default function BusinessDetailClient({ tenant, resources }: Props) {
       {/* Details */}
       {tab === 'Details' && (
         <div className="flex flex-col gap-6">
-          <div className="bg-white shadow-sm divide-y divide-border/50">
+          <div className="bg-card shadow-sm divide-y divide-border/50">
             <div className="px-5 py-3 flex justify-between text-sm">
               <span className="text-secondary">Email</span>
               <span className="text-ink">{tenant.email || '-'}</span>
@@ -141,7 +141,7 @@ export default function BusinessDetailClient({ tenant, resources }: Props) {
                   value={confirmText}
                   onChange={(e) => setConfirmText(e.target.value)}
                   placeholder={tenant.name}
-                  className="w-full border border-rose-300 bg-white px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-rose-400 transition"
+                  className="w-full border border-rose-300 bg-card px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-rose-400 transition"
                   autoFocus
                 />
                 {deleteError && (
@@ -176,7 +176,7 @@ export default function BusinessDetailClient({ tenant, resources }: Props) {
           <p className="text-xs text-secondary">
             Staff and assets available to assign to sessions.
           </p>
-          <div className="bg-white shadow-sm p-5">
+          <div className="bg-card shadow-sm p-5">
             <ResourceManager tenantId={tenant.id} resources={resources} />
           </div>
         </div>

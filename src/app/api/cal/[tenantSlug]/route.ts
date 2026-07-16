@@ -54,13 +54,16 @@ function bookingToFeedEvent(b: Booking): FeedEvent | null {
 }
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ tenantSlug: string }> },
 ) {
   const { tenantSlug } = await params
+  const token = req.nextUrl.searchParams.get('token')
 
   const tenant = await tenantService.getTenantBySlug(tenantSlug)
-  if (!tenant) return new NextResponse('Not found', { status: 404 })
+  if (!tenant || !token || token !== tenant.icalToken) {
+    return new NextResponse('Not found', { status: 404 })
+  }
 
   const allBookings = await bookingService.getBookings(tenant.id)
 

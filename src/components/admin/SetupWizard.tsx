@@ -92,7 +92,7 @@ function ResourceSection({
         <button
           type="button"
           onClick={onAdd}
-          className="px-4 py-2.5 bg-ink text-white text-sm font-medium hover:bg-ink/85 transition-colors shrink-0"
+          className="px-4 py-2.5 bg-accent text-white text-sm font-medium hover:bg-accent-hover transition-colors shrink-0"
         >
           Add
         </button>
@@ -664,7 +664,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
                         {AVAIL_DAYS.map((d) => (
                           <button key={d.value} type="button"
                             onClick={() => { setAvailDays(p => p.includes(d.value) ? p.filter(x => x !== d.value) : [...p, d.value]); setFormTouched(true) }}
-                            className={`px-3 py-1.5 text-xs font-medium border transition-colors ${availDays.includes(d.value) ? 'bg-ink text-white border-ink' : 'bg-card text-secondary border-border hover:border-ink/30'}`}
+                            className={`px-3 py-1.5 text-xs font-medium border transition-colors ${availDays.includes(d.value) ? 'bg-accent text-white border-accent' : 'bg-card text-secondary border-border hover:border-ink/30'}`}
                           >
                             {d.label}
                           </button>
@@ -749,7 +749,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
                 <button
                   type="button"
                   onClick={addPattern}
-                  className={`w-full bg-ink text-white px-3 py-2.5 text-sm font-medium hover:bg-ink/85 transition-all ${editingId ? 'ring-2 ring-offset-2 ring-amber-400 animate-pulse' : ''}`}
+                  className={`w-full bg-accent text-white px-3 py-2.5 text-sm font-medium hover:bg-accent-hover transition-all ${editingId ? 'ring-2 ring-offset-2 ring-amber-400 animate-pulse' : ''}`}
                 >
                   {editingId
                     ? 'Save changes'
@@ -855,8 +855,8 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
         {/* Step 8 - Calendar */}
         {step === 8 && (() => {
           const icalUrl = typeof window !== 'undefined'
-            ? `${window.location.origin}/api/cal/${tenant.slug}`
-            : `/api/cal/${tenant.slug}`
+            ? `${window.location.origin}/api/cal/${tenant.slug}?token=${tenant.icalToken}`
+            : `/api/cal/${tenant.slug}?token=${tenant.icalToken}`
           const connectGoogleUrl = `/api/auth/google?tenant_id=${tenant.id}&return_to=${encodeURIComponent('/setup?step=8')}`
           return (
             <>
@@ -899,7 +899,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
                 ) : (
                   <a
                     href={connectGoogleUrl}
-                    className="flex items-center justify-center gap-2 w-full bg-ink text-white px-3 py-2.5 text-sm font-medium hover:bg-ink/85 transition-colors"
+                    className="flex items-center justify-center gap-2 w-full bg-accent text-white px-3 py-2.5 text-sm font-medium hover:bg-accent-hover transition-colors"
                   >
                     Connect Google Calendar
                   </a>
@@ -939,7 +939,7 @@ export default function SetupWizard({ tenant, userEmail = '' }: Props) {
                       setCalLinkCopied(true)
                       setTimeout(() => setCalLinkCopied(false), 2000)
                     }}
-                    className="shrink-0 px-3 py-2 bg-ink text-white text-xs font-medium hover:bg-ink/85 transition-colors"
+                    className="shrink-0 px-3 py-2 bg-accent text-white text-xs font-medium hover:bg-accent-hover transition-colors"
                   >
                     {calLinkCopied ? 'Copied' : 'Copy'}
                   </button>

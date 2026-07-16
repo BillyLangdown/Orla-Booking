@@ -42,11 +42,11 @@ export function generateICS(opts: ICSOptions): string {
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Slick Booking//EN',
+    'PRODID:-//Orla Booking//EN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
-    `UID:${opts.uid}@slick`,
+    `UID:${opts.uid}@orla`,
     `DTSTAMP:${now}`,
     `DTSTART:${dtFmt(opts.startIso)}`,
     `DTEND:${dtFmt(opts.endIso)}`,

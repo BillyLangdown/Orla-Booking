@@ -9,7 +9,7 @@ import Button from '@/components/ui/Button'
 const TABS = ['Business', 'Admin login'] as const
 type Tab = typeof TABS[number]
 
-const inputClass = 'w-full border border-border bg-white px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-accent transition'
+const inputClass = 'w-full border border-border bg-card px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-accent transition'
 const labelClass = 'text-xs font-semibold uppercase tracking-wide text-secondary'
 
 function slugify(s: string) {
@@ -77,7 +77,7 @@ export default function NewBusinessForm() {
 
       {/* Business tab */}
       {tab === 'Business' && (
-        <div className="bg-white shadow-sm p-5 flex flex-col gap-4">
+        <div className="bg-card shadow-sm p-5 flex flex-col gap-4">
           <Input
             label="Business name"
             value={name}
@@ -116,7 +116,7 @@ export default function NewBusinessForm() {
 
       {/* Admin login tab */}
       {tab === 'Admin login' && (
-        <div className="bg-white shadow-sm p-5 flex flex-col gap-4">
+        <div className="bg-card shadow-sm p-5 flex flex-col gap-4">
           <p className="text-xs text-secondary">
             An invite email will be sent to this address. The owner clicks the link and sets their own password during onboarding.
           </p>

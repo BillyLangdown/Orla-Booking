@@ -95,7 +95,7 @@ export default function CalendarView({ bookings, onSelect }: Props) {
                   className={[
                     'relative flex h-11 w-11 items-center justify-center rounded-full text-sm font-medium transition-all',
                     isSelected
-                      ? 'bg-ink text-white scale-105 shadow-sm'
+                      ? 'bg-accent text-white scale-105 shadow-sm'
                       : hasData
                       ? 'bg-ink/10 text-ink font-semibold hover:bg-ink/20 active:scale-95'
                       : 'text-secondary/50 cursor-default',

@@ -91,7 +91,7 @@ export default function AvailabilityCalendarView({ slots }: Props) {
                   className={[
                     'relative flex h-11 w-11 items-center justify-center rounded-full text-sm font-medium transition-all',
                     isSelected
-                      ? 'bg-ink text-white scale-105 shadow-sm'
+                      ? 'bg-accent text-white scale-105 shadow-sm'
                       : full && !isPast
                       ? 'bg-rose-100 text-rose-700 font-semibold hover:bg-rose-200 active:scale-95'
                       : hasData && !isPast

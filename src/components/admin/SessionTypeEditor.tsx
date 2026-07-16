@@ -43,7 +43,7 @@ export default function SessionTypeEditor({ types, onChange, suggestions = [] }:
           type="button"
           onClick={() => add(input)}
           disabled={!input.trim() || types.includes(input.trim())}
-          className="px-4 py-2.5 bg-ink text-white text-sm font-medium hover:bg-ink/85 transition-colors disabled:opacity-40 shrink-0"
+          className="px-4 py-2.5 bg-accent text-white text-sm font-medium hover:bg-accent-hover transition-colors disabled:opacity-40 shrink-0"
         >
           Add
         </button>

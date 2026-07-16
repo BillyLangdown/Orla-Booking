@@ -70,7 +70,7 @@ export default function BookingPageLink({ slug, variant = 'compact' }: Props) {
       <button
         type="button"
         onClick={handleShare}
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-white bg-ink hover:bg-ink/85 transition-colors px-2.5 py-1.5 whitespace-nowrap"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-white bg-accent hover:bg-accent-hover transition-colors px-2.5 py-1.5 whitespace-nowrap"
       >
         {copied ? (
           <>

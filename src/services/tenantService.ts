@@ -33,6 +33,7 @@ function mapTenant(row: Record<string, unknown>): Tenant {
     orlaBusinessContext:     (row.orla_business_context       as string)       ?? undefined,
     orlaIntakePrompt:        (row.orla_intake_prompt          as string)       ?? undefined,
     generalAvailability:     (row.general_availability        as string)       ?? undefined,
+    icalToken:               row.ical_token as string,
   }
 }
 

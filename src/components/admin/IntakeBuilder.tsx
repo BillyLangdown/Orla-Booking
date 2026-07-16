@@ -72,7 +72,7 @@ export default function IntakeBuilder({ questions, onChange }: Props) {
           {/* Card header */}
           <div className="flex items-center justify-between gap-2 px-4 pt-4 pb-3">
             <div className="flex items-center gap-2.5">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-ink text-white text-[10px] font-bold shrink-0">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent text-white text-[10px] font-bold shrink-0">
                 {i + 1}
               </span>
               <span className="text-xs font-medium text-secondary">{TYPE_LABELS[q.type]}</span>
@@ -132,7 +132,7 @@ export default function IntakeBuilder({ questions, onChange }: Props) {
                 })}
                 className={`py-2 px-3 text-xs font-medium border transition-all text-left rounded-md ${
                   q.type === t
-                    ? 'bg-ink text-white border-ink'
+                    ? 'bg-accent text-white border-accent'
                     : 'bg-card text-secondary border-border hover:border-ink/40 hover:text-ink'
                 }`}
               >

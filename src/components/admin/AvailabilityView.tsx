@@ -32,7 +32,7 @@ function FilterChip({
       className={[
         'px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
         active
-          ? 'bg-ink text-white'
+          ? 'bg-accent text-white'
           : 'bg-card border border-border text-secondary hover:text-ink hover:border-secondary/40',
       ].join(' ')}
     >

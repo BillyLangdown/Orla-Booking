@@ -104,7 +104,7 @@ export default async function CalendarPage({ searchParams }: Props) {
   return (
     <div className="min-h-dvh bg-surface flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm">
-        <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm">
+        <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
           <div className="px-6 pt-8 pb-6 border-b border-border">
             <p className="text-xs font-semibold uppercase tracking-widest text-secondary mb-2">Add to calendar</p>
             <h1 className="text-lg font-bold text-ink leading-snug">{title}</h1>
