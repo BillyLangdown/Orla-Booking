@@ -566,3 +566,78 @@ Reply directly to this email to get back to ${tenant.name}.`
     console.error('[email] Failed to send custom message:', err)
   }
 }
+
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+export async function sendContactMessage(
+  name: string,
+  email: string,
+  message: string,
+): Promise<{ ok: boolean; error?: string }> {
+  if (!resend) {
+    console.warn('[email] sendContactMessage skipped - no Resend client')
+    return { ok: false, error: 'Email is not configured' }
+  }
+
+  const safeName = escapeHtml(name.trim())
+  const safeEmail = escapeHtml(email.trim())
+  const safeMessage = escapeHtml(message.trim())
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family:sans-serif;color:#0f172a;background:#f8fafc;margin:0;padding:32px 16px;">
+  <div style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;">
+    <div style="padding:28px;">
+      <h1 style="margin:0 0 20px;font-size:20px;font-weight:600;">New enquiry from Orla</h1>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+        <tr>
+          <td style="padding:8px 0;border-bottom:1px solid #e2e8f0;color:#64748b;width:100px;font-size:13px;">Name</td>
+          <td style="padding:8px 0;border-bottom:1px solid #e2e8f0;font-size:13px;">${safeName}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0;border-bottom:1px solid #e2e8f0;color:#64748b;font-size:13px;">Email</td>
+          <td style="padding:8px 0;border-bottom:1px solid #e2e8f0;font-size:13px;"><a href="mailto:${safeEmail}" style="color:#0f172a;">${safeEmail}</a></td>
+        </tr>
+      </table>
+      <div style="padding:16px;background:#f8fafc;border-radius:8px;font-size:14px;color:#0f172a;white-space:pre-line;">${safeMessage}</div>
+    </div>
+  </div>
+</body>
+</html>`
+
+  const text = `New enquiry from Orla
+
+Name: ${name.trim()}
+Email: ${email.trim()}
+
+${message.trim()}`
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: FROM,
+      to: 'orla@williamlangdown.com',
+      replyTo: email.trim(),
+      subject: `New enquiry from ${name.trim()}`,
+      html,
+      text,
+    })
+    if (error) {
+      console.error('[email] Contact message send failed:', error)
+      return { ok: false, error: 'Failed to send message' }
+    }
+    console.log('[email] Contact message sent:', data?.id)
+    return { ok: true }
+  } catch (err) {
+    console.error('[email] Failed to send contact message:', err)
+    return { ok: false, error: 'Failed to send message' }
+  }
+}

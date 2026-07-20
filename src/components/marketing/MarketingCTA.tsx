@@ -5,8 +5,8 @@ export default function MarketingCTA() {
     <section id="cta" className="mx-auto max-w-4xl px-6 py-28 text-center">
       <Reveal>
         <h2 className="font-display text-3xl font-bold tracking-tight sm:text-5xl">
-          Ready to run bookings
-          <br />the calm way?
+          Ready to stop
+          <br />the back-and-forth?
         </h2>
         <p className="mx-auto mt-5 max-w-md text-secondary">
           Get in touch and we&apos;ll set your business up with a booking page,
@@ -14,7 +14,7 @@ export default function MarketingCTA() {
         </p>
         <div className="mt-9 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <a
-            href="mailto:hello@williamlangdown.com"
+            href="/contact"
             className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"
           >
             Get Orla for your business
