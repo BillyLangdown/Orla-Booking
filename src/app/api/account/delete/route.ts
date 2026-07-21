@@ -7,6 +7,15 @@ export async function POST(req: NextRequest) {
   const accessToken = authHeader.replace(/^bearer /i, '').trim()
   if (!accessToken) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  // TEMP DEBUG - remove before deploying anything else
+  if (req.headers.get('x-debug-config') === '1') {
+    return NextResponse.json({
+      urlPrefix: (process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'MISSING').slice(0, 40),
+      keyPrefix: (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? 'MISSING').slice(0, 20),
+      keyLen: (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? '').length,
+    })
+  }
+
   const userClient = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
