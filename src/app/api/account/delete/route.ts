@@ -9,18 +9,28 @@ export async function POST(req: NextRequest) {
 
   // TEMP DEBUG - remove before deploying anything else
   if (req.headers.get('x-debug-config') === '1') {
-    const dbgClient = createClient(
+    const clientWithHeader = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
       { global: { headers: { authorization: `Bearer ${accessToken}` } } },
     )
-    const result = await dbgClient.auth.getUser(accessToken)
+    const withHeaderResult = await clientWithHeader.auth.getUser(accessToken)
+
+    const plainClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    )
+    const plainResult = await plainClient.auth.getUser(accessToken)
+
     return NextResponse.json({
-      hasUser: !!result.data.user,
-      userId: result.data.user?.id ?? null,
-      error: result.error ? { message: result.error.message, status: result.error.status, name: result.error.name } : null,
-      tokenPrefix: accessToken.slice(0, 20),
-      tokenLen: accessToken.length,
+      withGlobalHeader: {
+        hasUser: !!withHeaderResult.data.user,
+        error: withHeaderResult.error?.message ?? null,
+      },
+      plainClientNoHeader: {
+        hasUser: !!plainResult.data.user,
+        error: plainResult.error?.message ?? null,
+      },
     })
   }
 
